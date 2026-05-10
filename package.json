@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cd client && npx vite build",
+    "build": "cd client && npx vite build && cp -r dist ../dist",
     "server": "node server/src/app.js",
     "dev": "concurrently \"npm run server\" \"cd client && npm run dev\""
   },
