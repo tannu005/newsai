@@ -16,40 +16,41 @@ const STORE_FILE = path.join(process.cwd(), 'src/vectorstore/store.json');
  * Initialize or retrieve the vector store singleton.
  * Attempts to load persisted data from disk on first call.
  */
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 export async function getVectorStore() {
   if (vectorStore) return vectorStore;
 
   const embeddings = getEmbeddings();
   
-  // Try multiple potential paths for Vercel/Production
-  const possiblePaths = [
-    path.join(process.cwd(), 'server/src/vectorstore/store.json'),
-    path.join(process.cwd(), 'src/vectorstore/store.json'),
-    path.resolve(__dirname, '../vectorstore/store.json')
-  ];
-
-  for (const p of possiblePaths) {
+  try {
+    let data;
     try {
-      console.log(`🔍 Checking vector store at: ${p}`);
-      const raw = await fs.readFile(p, 'utf-8');
-      const data = JSON.parse(raw);
-
-      if (data.vectors && data.vectors.length > 0) {
-        vectorStore = new MemoryVectorStore(embeddings);
-        vectorStore.memoryVectors = data.vectors.map((v) => ({
-          content: v.content,
-          embedding: v.embedding,
-          metadata: v.metadata,
-        }));
-        console.log(`✅ Successfully loaded ${data.vectors.length} vectors from: ${p}`);
-        return vectorStore;
-      }
-    } catch (error) {
-      // Continue to next path
+      // First try to read from disk (for local dev where we might have just ingested)
+      const raw = await fs.readFile(path.resolve(__dirname, '../vectorstore/store.json'), 'utf-8');
+      data = JSON.parse(raw);
+    } catch (e) {
+      // If disk read fails (like on Vercel), fallback to the bundled require
+      console.log('Falling back to bundled vector store data...');
+      data = require('../vectorstore/store.json');
     }
+
+    if (data && data.vectors && data.vectors.length > 0) {
+      vectorStore = new MemoryVectorStore(embeddings);
+      vectorStore.memoryVectors = data.vectors.map((v) => ({
+        content: v.content,
+        embedding: v.embedding,
+        metadata: v.metadata,
+      }));
+      console.log(`✅ Successfully loaded ${data.vectors.length} vectors.`);
+      return vectorStore;
+    }
+  } catch (error) {
+    console.warn(`⚠️ No persisted vector store found: ${error.message}`);
   }
 
-  console.warn('⚠️ No persisted vector store found in any location. Creating empty store.');
+  console.warn('⚠️ Creating empty vector store.');
   vectorStore = new MemoryVectorStore(embeddings);
   return vectorStore;
 }
