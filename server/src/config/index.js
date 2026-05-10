@@ -14,8 +14,8 @@ const config = {
   chunkSize: parseInt(process.env.CHUNK_SIZE, 10) || 800,
   chunkOverlap: parseInt(process.env.CHUNK_OVERLAP, 10) || 200,
   dataPath: path.resolve(__dirname, '../data'),
-  embeddingModel: process.env.EMBEDDING_MODEL || 'gemini-embedding-001',
-  llmModel: process.env.LLM_MODEL || 'gemini-2.0-flash',
+  embeddingModel: 'gemini-embedding-001', // Hardcoded to bypass Vercel env var override
+  llmModel: 'gemini-2.0-flash', // Hardcoded to bypass Vercel env var override
   topK: 5,
   temperature: 0.3,
 };
