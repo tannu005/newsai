@@ -37,18 +37,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error', details: err.message });
 });
 
-// Start server
-app.listen(config.port, () => {
-  console.log(`\n🚀 NewsAI Server running on http://localhost:${config.port}`);
-  console.log(`📡 API endpoints:`);
-  console.log(`   POST /api/chat     → Chat with the news dataset`);
-  console.log(`   POST /api/ingest   → Ingest news articles`);
-  console.log(`   GET  /api/history  → Fetch chat history`);
-  console.log(`   GET  /api/health   → Health check\n`);
+// Start server only if not in a serverless environment (like Vercel)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`\n🚀 NewsAI Server running on http://localhost:${config.port}`);
+    console.log(`📡 API endpoints:`);
+    console.log(`   POST /api/chat     → Chat with the news dataset`);
+    console.log(`   POST /api/ingest   → Ingest news articles`);
+    console.log(`   GET  /api/history  → Fetch chat history`);
+    console.log(`   GET  /api/health   → Health check\n`);
 
-  if (!config.googleApiKey) {
-    console.warn('⚠️  GOOGLE_API_KEY not set! Copy .env.example to .env and add your key.\n');
-  }
-});
+    if (!config.googleApiKey) {
+      console.warn('⚠️  GOOGLE_API_KEY not set! Copy .env.example to .env and add your key.\n');
+    }
+  });
+}
 
 export default app;
