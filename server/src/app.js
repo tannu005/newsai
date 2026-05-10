@@ -26,9 +26,22 @@ app.use('/api/chat', chatRouter);
 app.use('/api/ingest', ingestRouter);
 app.use('/api/history', historyRouter);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+import { getVectorCount } from './services/vectorStoreService.js';
+
+// Health check with diagnostic info
+app.get('/api/health', async (req, res) => {
+  try {
+    const vectorCount = await getVectorCount();
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      hasApiKey: !!config.googleApiKey,
+      vectorCount: vectorCount,
+      env: process.env.NODE_ENV
+    });
+  } catch (error) {
+    res.json({ status: 'degraded', error: error.message });
+  }
 });
 
 // Error handling middleware
