@@ -42,6 +42,8 @@ app.get('/api/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       hasApiKey: !!config.googleApiKey,
       vectorCount: vectorCount,
+      embeddingModel: config.embeddingModel,
+      llmModel: config.llmModel,
       env: process.env.NODE_ENV,
       isVercel: !!process.env.VERCEL
     });
