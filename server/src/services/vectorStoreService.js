@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 let vectorStore = null;
-const STORE_FILE = path.resolve(config.vectorStorePath, 'store.json');
+const STORE_FILE = path.join(process.cwd(), 'src/vectorstore/store.json');
 
 /**
  * Initialize or retrieve the vector store singleton.
@@ -15,15 +15,14 @@ export async function getVectorStore() {
   if (vectorStore) return vectorStore;
 
   const embeddings = getEmbeddings();
+  console.log(`🔍 Attempting to load vector store from: ${STORE_FILE}`);
 
   // Try loading persisted store
   try {
-    await fs.access(STORE_FILE);
     const raw = await fs.readFile(STORE_FILE, 'utf-8');
     const data = JSON.parse(raw);
 
     if (data.vectors && data.vectors.length > 0) {
-      // Reconstruct MemoryVectorStore from saved data
       vectorStore = new MemoryVectorStore(embeddings);
       vectorStore.memoryVectors = data.vectors.map((v) => ({
         content: v.content,
@@ -33,8 +32,27 @@ export async function getVectorStore() {
       console.log(`✅ Loaded ${data.vectors.length} vectors from disk`);
       return vectorStore;
     }
-  } catch {
-    // No persisted store found — will create fresh
+  } catch (error) {
+    console.warn(`⚠️ Could not load persisted store: ${error.message}`);
+    // Check if we can find it in another path (Vercel specific)
+    try {
+      const fallbackPath = path.join(process.cwd(), 'server/src/vectorstore/store.json');
+      console.log(`🔍 Trying fallback path: ${fallbackPath}`);
+      const raw = await fs.readFile(fallbackPath, 'utf-8');
+      const data = JSON.parse(raw);
+      if (data.vectors && data.vectors.length > 0) {
+        vectorStore = new MemoryVectorStore(embeddings);
+        vectorStore.memoryVectors = data.vectors.map((v) => ({
+          content: v.content,
+          embedding: v.embedding,
+          metadata: v.metadata,
+        }));
+        console.log(`✅ Loaded ${data.vectors.length} vectors from fallback disk`);
+        return vectorStore;
+      }
+    } catch (e) {
+      console.warn(`⚠️ Fallback path also failed: ${e.message}`);
+    }
   }
 
   vectorStore = new MemoryVectorStore(embeddings);
@@ -87,20 +105,24 @@ export async function getVectorCount() {
 async function persistStore() {
   if (!vectorStore) return;
 
-  // Ensure directory exists
-  await fs.mkdir(config.vectorStorePath, { recursive: true });
+  try {
+    // Ensure directory exists
+    await fs.mkdir(config.vectorStorePath, { recursive: true });
 
-  const data = {
-    vectors: vectorStore.memoryVectors.map((v) => ({
-      content: v.content,
-      embedding: v.embedding,
-      metadata: v.metadata,
-    })),
-    savedAt: new Date().toISOString(),
-  };
+    const data = {
+      vectors: vectorStore.memoryVectors.map((v) => ({
+        content: v.content,
+        embedding: v.embedding,
+        metadata: v.metadata,
+      })),
+      savedAt: new Date().toISOString(),
+    };
 
-  await fs.writeFile(STORE_FILE, JSON.stringify(data), 'utf-8');
-  console.log(`💾 Persisted ${data.vectors.length} vectors to disk`);
+    await fs.writeFile(STORE_FILE, JSON.stringify(data), 'utf-8');
+    console.log(`💾 Persisted ${data.vectors.length} vectors to disk`);
+  } catch (error) {
+    console.warn(`⚠️ Failed to persist store (expected on read-only environments): ${error.message}`);
+  }
 }
 
 /**
