@@ -4,6 +4,11 @@ import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 let vectorStore = null;
 const STORE_FILE = path.join(process.cwd(), 'src/vectorstore/store.json');
 
@@ -15,31 +20,20 @@ export async function getVectorStore() {
   if (vectorStore) return vectorStore;
 
   const embeddings = getEmbeddings();
-  console.log(`🔍 Attempting to load vector store from: ${STORE_FILE}`);
+  
+  // Try multiple potential paths for Vercel/Production
+  const possiblePaths = [
+    path.join(process.cwd(), 'server/src/vectorstore/store.json'),
+    path.join(process.cwd(), 'src/vectorstore/store.json'),
+    path.resolve(__dirname, '../vectorstore/store.json')
+  ];
 
-  // Try loading persisted store
-  try {
-    const raw = await fs.readFile(STORE_FILE, 'utf-8');
-    const data = JSON.parse(raw);
-
-    if (data.vectors && data.vectors.length > 0) {
-      vectorStore = new MemoryVectorStore(embeddings);
-      vectorStore.memoryVectors = data.vectors.map((v) => ({
-        content: v.content,
-        embedding: v.embedding,
-        metadata: v.metadata,
-      }));
-      console.log(`✅ Loaded ${data.vectors.length} vectors from disk`);
-      return vectorStore;
-    }
-  } catch (error) {
-    console.warn(`⚠️ Could not load persisted store: ${error.message}`);
-    // Check if we can find it in another path (Vercel specific)
+  for (const p of possiblePaths) {
     try {
-      const fallbackPath = path.join(process.cwd(), 'server/src/vectorstore/store.json');
-      console.log(`🔍 Trying fallback path: ${fallbackPath}`);
-      const raw = await fs.readFile(fallbackPath, 'utf-8');
+      console.log(`🔍 Checking vector store at: ${p}`);
+      const raw = await fs.readFile(p, 'utf-8');
       const data = JSON.parse(raw);
+
       if (data.vectors && data.vectors.length > 0) {
         vectorStore = new MemoryVectorStore(embeddings);
         vectorStore.memoryVectors = data.vectors.map((v) => ({
@@ -47,16 +41,16 @@ export async function getVectorStore() {
           embedding: v.embedding,
           metadata: v.metadata,
         }));
-        console.log(`✅ Loaded ${data.vectors.length} vectors from fallback disk`);
+        console.log(`✅ Successfully loaded ${data.vectors.length} vectors from: ${p}`);
         return vectorStore;
       }
-    } catch (e) {
-      console.warn(`⚠️ Fallback path also failed: ${e.message}`);
+    } catch (error) {
+      // Continue to next path
     }
   }
 
+  console.warn('⚠️ No persisted vector store found in any location. Creating empty store.');
   vectorStore = new MemoryVectorStore(embeddings);
-  console.log('📦 Created new empty vector store');
   return vectorStore;
 }
 
