@@ -1,30 +1,45 @@
 import { Router } from 'express';
-import { inngest } from '../inngest/client.js';
 import { isStorePopulated, getVectorCount } from '../services/vectorStoreService.js';
+import { ingestDataset } from '../services/ingestionService.js';
 
 const router = Router();
 
 /**
  * POST /api/ingest
- * Triggers the dataset ingestion pipeline via Inngest.
+ * Triggers the dataset ingestion pipeline.
+ * Uses Inngest for background processing if available, otherwise runs directly.
  */
 router.post('/', async (req, res) => {
   try {
     const forceReindex = req.body.forceReindex || false;
 
-    // Send event to Inngest to start background processing
-    const { ids } = await inngest.send({
-      name: "api/news.ingest",
-      data: { forceReindex },
-    });
+    // Try Inngest first (if available), otherwise run directly
+    if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
+      try {
+        const { inngest } = await import('../inngest/client.js');
+        const { ids } = await inngest.send({
+          name: "api/news.ingest",
+          data: { forceReindex },
+        });
+        return res.json({
+          status: 'success',
+          message: 'Ingestion started in the background',
+          eventId: ids[0],
+        });
+      } catch (inngestError) {
+        console.warn('Inngest unavailable, falling back to direct ingestion:', inngestError.message);
+      }
+    }
 
+    // Direct ingestion fallback
+    const result = await ingestDataset(forceReindex);
     res.json({
       status: 'success',
-      message: 'Ingestion started in the background',
-      eventId: ids[0],
+      message: 'Ingestion completed',
+      ...result,
     });
   } catch (error) {
-    console.error('Ingestion trigger error:', error);
+    console.error('Ingestion error:', error);
     res.status(500).json({ error: 'Failed to start ingestion', details: error.message });
   }
 });
