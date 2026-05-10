@@ -1,41 +1,31 @@
 import { Router } from 'express';
-import { ingestDataset } from '../services/ingestionService.js';
+import { inngest } from '../inngest/client.js';
 import { isStorePopulated, getVectorCount } from '../services/vectorStoreService.js';
 
 const router = Router();
 
-let ingestionStatus = { status: 'idle', progress: null };
-
 /**
  * POST /api/ingest
- * Triggers the dataset ingestion pipeline.
+ * Triggers the dataset ingestion pipeline via Inngest.
  */
 router.post('/', async (req, res) => {
   try {
-    if (ingestionStatus.status === 'processing') {
-      return res.status(409).json({ error: 'Ingestion already in progress' });
-    }
-
-    ingestionStatus = { status: 'processing', startedAt: new Date().toISOString() };
-
     const forceReindex = req.body.forceReindex || false;
-    const result = await ingestDataset(forceReindex);
 
-    ingestionStatus = {
-      status: 'complete',
-      ...result,
-      completedAt: new Date().toISOString(),
-    };
+    // Send event to Inngest to start background processing
+    const { ids } = await inngest.send({
+      name: "api/news.ingest",
+      data: { forceReindex },
+    });
 
     res.json({
       status: 'success',
-      documentsProcessed: result.documentsProcessed,
-      chunksCreated: result.chunksCreated,
+      message: 'Ingestion started in the background',
+      eventId: ids[0],
     });
   } catch (error) {
-    ingestionStatus = { status: 'error', error: error.message };
-    console.error('Ingestion error:', error);
-    res.status(500).json({ error: 'Ingestion failed', details: error.message });
+    console.error('Ingestion trigger error:', error);
+    res.status(500).json({ error: 'Failed to start ingestion', details: error.message });
   }
 });
 
@@ -48,7 +38,6 @@ router.get('/status', async (req, res) => {
     const populated = await isStorePopulated();
     const vectorCount = await getVectorCount();
     res.json({
-      ...ingestionStatus,
       isPopulated: populated,
       vectorCount,
     });

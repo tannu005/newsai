@@ -5,11 +5,21 @@ import chatRouter from './routes/chat.js';
 import ingestRouter from './routes/ingest.js';
 import historyRouter from './routes/history.js';
 
+import { serve } from "inngest/express";
+import { inngest } from "./inngest/client.js";
+import { ingestNewsDataset } from "./inngest/functions.js";
+
 const app = express();
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
+
+// Inngest Middleware
+app.use(
+  "/api/inngest",
+  serve({ client: inngest, functions: [ingestNewsDataset] })
+);
 
 // API Routes
 app.use('/api/chat', chatRouter);
