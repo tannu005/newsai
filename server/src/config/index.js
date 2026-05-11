@@ -15,7 +15,7 @@ const config = {
   chunkOverlap: parseInt(process.env.CHUNK_OVERLAP, 10) || 200,
   dataPath: path.resolve(__dirname, '../data'),
   embeddingModel: 'gemini-embedding-001', // Hardcoded to bypass Vercel env var override
-  llmModel: 'gemini-2.0-flash', // Hardcoded to bypass Vercel env var override
+  llmModel: 'gemini-2.5-flash', // Verified working model on v1beta
   topK: 5,
   temperature: 0.3,
 };
