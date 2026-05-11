@@ -1,0 +1,124 @@
+[
+  {
+    "id": "0ca7da53-73fe-4b2c-847f-376425161c57",
+    "role": "user",
+    "content": "Hello",
+    "timestamp": "2026-05-11T14:51:16.823Z",
+    "sessionId": "9725c83b-4d5a-4db9-a96f-c7fe27b840f1"
+  },
+  {
+    "id": "8b5c82c8-665a-4732-bb2a-7a95b1656606",
+    "role": "assistant",
+    "content": "⚠️ The news dataset has not been ingested yet. Please click the **\"Ingest Data\"** button in the header to load the dataset first.",
+    "sources": [],
+    "context": "",
+    "timestamp": "2026-05-11T14:51:16.824Z",
+    "sessionId": "9725c83b-4d5a-4db9-a96f-c7fe27b840f1"
+  },
+  {
+    "id": "9149e1d9-ac30-48c7-990c-8edae74b4234",
+    "role": "user",
+    "content": "Hello",
+    "timestamp": "2026-05-11T14:53:14.543Z",
+    "sessionId": "d5481b89-92b5-4f1c-b7f2-f725366ef022"
+  },
+  {
+    "id": "f555164f-9710-43e6-bc71-44e8a9eba094",
+    "role": "assistant",
+    "content": "Hello! I am NewsAI, an intelligent news analysis assistant. How can I help you today? Please feel free to ask me about the provided news articles.",
+    "sources": [
+      {
+        "title": "OpenAI Unveils GPT-5 with Enhanced Reasoning",
+        "category": "Technology",
+        "source": "TechCrunch",
+        "url": "https://techcrunch.com/openai-gpt5",
+        "publishedAt": "2024-11-15",
+        "relevanceScore": 0.23,
+        "snippet": "OpenAI Unveils GPT-5 with Enhanced Reasoning..."
+      },
+      {
+        "title": "Global Climate Summit Reaches Historic Agreement",
+        "category": "Politics",
+        "source": "BBC News",
+        "url": "https://bbc.com/cop29-agreement",
+        "publishedAt": "2024-11-14",
+        "relevanceScore": 0.23,
+        "snippet": "Global Climate Summit Reaches Historic Agreement..."
+      },
+      {
+        "title": "Apple Introduces Revolutionary Mixed Reality Headset",
+        "category": "Technology",
+        "source": "The Verge",
+        "url": "https://theverge.com/apple-vision-pro-2",
+        "publishedAt": "2024-11-11",
+        "relevanceScore": 0.23,
+        "snippet": "Apple Introduces Revolutionary Mixed Reality Headset..."
+      },
+      {
+        "title": "Federal Reserve Holds Interest Rates Steady",
+        "category": "Business",
+        "source": "Reuters",
+        "url": "https://reuters.com/fed-rates",
+        "publishedAt": "2024-11-10",
+        "relevanceScore": 0.23,
+        "snippet": "Federal Reserve Holds Interest Rates Steady..."
+      },
+      {
+        "title": "Ocean Temperatures Hit Record Highs for Third Consecutive Month",
+        "category": "Science",
+        "source": "Scientific American",
+        "url": "https://scientificamerican.com/ocean-temps",
+        "publishedAt": "2024-10-12",
+        "relevanceScore": 0.23,
+        "snippet": "Ocean Temperatures Hit Record Highs for Third Consecutive Month..."
+      }
+    ],
+    "context": "[Article 1: \"OpenAI Unveils GPT-5 with Enhanced Reasoning\" — TechCrunch]\nOpenAI Unveils GPT-5 with Enhanced Reasoning\n\n---\n\n[Article 2: \"Global Climate Summit Reaches Historic Agreement\" — BBC News]\nGlobal Climate Summit Reaches Historic Agreement\n\n---\n\n[Article 3: \"Apple Introduces Revolutionary Mixed Reality Headset\" — The Verge]\nApple Introduces Revolutionary Mixed Reality Headset\n\n---\n\n[Article 4: \"Federal Reserve Holds Interest Rates Steady\" — Reuters]\nFederal Reserve Holds Interest Rates Steady\n\n---\n\n[Article 5: \"Ocean Temperatures Hit Record Highs for Third Consecutive Month\" — Scientific American]\nOcean Temperatures Hit Record Highs for Third Consecutive Month",
+    "timestamp": "2026-05-11T14:53:14.543Z",
+    "sessionId": "d5481b89-92b5-4f1c-b7f2-f725366ef022"
+  },
+  {
+    "id": "35ebafa7-cefe-4439-a554-43a748fec6eb",
+    "role": "user",
+    "content": "Tell me about recent developments in renewable energy",
+    "timestamp": "2026-05-11T15:04:49.483Z",
+    "sessionId": "3f9408d3-6080-4474-be84-552423e2f1fc"
+  },
+  {
+    "id": "9642be47-f9b3-4f57-94f9-9eb8f1da92bd",
+    "role": "assistant",
+    "content": "Recent developments in renewable energy highlight its growing competitiveness, record-breaking expansion, and increasing investment, as detailed in recent reports and news.\n\n### Key Developments in Renewable Energy:\n\n1.  **Cheapest Source of New Electricity Globally:**\n    *   According to a landmark report by the International Renewable Energy Agency (IRENA), solar and wind power are now the cheapest sources of new electricity generation in over 90 percent of the world (Article 1, Article 3).\n    *   The global weighted average cost of solar photovoltaic electricity has fallen to 3.5 cents per kilowatt-hour, representing a 90 percent decline from 2010 levels. Onshore wind costs have similarly dropped to 4.2 cents per kilowatt-hour (Article 3).\n    *   Even when including the cost of battery storage, renewable energy systems are competitive with fossil fuel plants in most markets (Article 3).\n\n2.  **Record Capacity Additions and Investment:**\n    *   Global renewable energy capacity additions reached 500 gigawatts in 2024, setting a new annual record (Article 3).\n    *   China leads these installations with over 200 gigawatts added, followed by the United States and the European Union (Article 2, Article 3).\n    *   Investment in clean energy reached 1.7 trillion dollars globally, exceeding fossil fuel investment for the first time (Article 2).\n\n3.  **Impact on Fossil Fuels:**\n    *   The decline in renewable costs is driving the accelerated retirement of coal-fired power plants worldwide (Article 2).\n\n4.  **National Initiatives:**\n    *   India has launched an ambitious Green Hydrogen Production Plan, indicating a strategic focus on advanced renewable energy technologies (Article 4).\n\nThese developments underscore a significant shift in the global energy landscape towards cleaner, more affordable, and widely adopted renewable sources.",
+    "sources": [
+      {
+        "title": "India Launches Ambitious Green Hydrogen Production Plan",
+        "category": "Science",
+        "source": "Reuters",
+        "url": "https://reuters.com/india-hydrogen",
+        "publishedAt": "2024-10-25",
+        "relevanceScore": 0.2,
+        "snippet": "India Launches Ambitious Green Hydrogen Production Plan..."
+      },
+      {
+        "title": "Global Climate Summit Reaches Historic Agreement",
+        "category": "Politics",
+        "source": "BBC News",
+        "url": "https://bbc.com/cop29-agreement",
+        "publishedAt": "2024-11-14",
+        "relevanceScore": 0.2,
+        "snippet": "Global Climate Summit Reaches Historic Agreement..."
+      },
+      {
+        "title": "Renewable Energy Now Cheapest Source of New Electricity Globally",
+        "category": "Science",
+        "source": "IRENA",
+        "url": "https://irena.org/renewable-costs",
+        "publishedAt": "2024-10-18",
+        "relevanceScore": 0.13,
+        "snippet": "Renewable Energy Now Cheapest Source of New Electricity Globally..."
+      }
+    ],
+    "context": "[Article 1: \"Renewable Energy Now Cheapest Source of New Electricity Globally\" — IRENA]\nRenewable Energy Now Cheapest Source of New Electricity Globally\n\n---\n\n[Article 2: \"Renewable Energy Now Cheapest Source of New Electricity Globally\" — IRENA]\n. China leads installations with over 200 gigawatts added, followed by the United States and the European Union. The decline in renewable costs is driving accelerated retirement of coal-fired power plants worldwide. Investment in clean energy reached 1.7 trillion dollars globally, exceeding fossil fuel investment for the first time.\n\n---\n\n[Article 3: \"Renewable Energy Now Cheapest Source of New Electricity Globally\" — IRENA]\nA landmark report by the International Renewable Energy Agency confirms that solar and wind power are now the cheapest sources of new electricity generation in over 90 percent of the world. The global weighted average cost of solar photovoltaic electricity has fallen to 3.5 cents per kilowatt-hour, a 90 percent decline from 2010 levels. Onshore wind costs have similarly dropped to 4.2 cents per kilowatt-hour. The report notes that even with the cost of battery storage included, renewable energy systems are competitive with fossil fuel plants in most markets. Global renewable energy capacity additions reached 500 gigawatts in 2024, a new annual record. China leads installations with over 200 gigawatts added, followed by the United States and the European Union\n\n---\n\n[Article 4: \"India Launches Ambitious Green Hydrogen Production Plan\" — Reuters]\nIndia Launches Ambitious Green Hydrogen Production Plan\n\n---\n\n[Article 5: \"Global Climate Summit Reaches Historic Agreement\" — BBC News]\nGlobal Climate Summit Reaches Historic Agreement",
+    "timestamp": "2026-05-11T15:04:49.483Z",
+    "sessionId": "3f9408d3-6080-4474-be84-552423e2f1fc"
+  }
+]

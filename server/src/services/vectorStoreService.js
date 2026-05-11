@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let vectorStore = null;
-const STORE_FILE = path.join(process.cwd(), 'src/vectorstore/store.json');
+const STORE_FILE = path.join(config.vectorStorePath, 'store.json');
 
 /**
  * Initialize or retrieve the vector store singleton.
@@ -28,10 +28,11 @@ export async function getVectorStore() {
     let data;
     try {
       // First try to read from disk (for local dev where we might have just ingested)
-      const raw = await fs.readFile(path.resolve(__dirname, '../vectorstore/store.json'), 'utf-8');
+      const raw = await fs.readFile(STORE_FILE, 'utf-8');
       data = JSON.parse(raw);
     } catch (e) {
       // If disk read fails (like on Vercel), fallback to the bundled require
+      // NOTE: The path must be a static string for Vercel's bundler to include the file
       console.log('Falling back to bundled vector store data...');
       data = require('../vectorstore/store.json');
     }

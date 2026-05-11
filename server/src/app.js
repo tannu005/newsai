@@ -45,7 +45,8 @@ app.get('/api/health', async (req, res) => {
       embeddingModel: config.embeddingModel,
       llmModel: config.llmModel,
       env: process.env.NODE_ENV,
-      isVercel: !!process.env.VERCEL
+      isVercel: !!process.env.VERCEL,
+      apiKeyPrefix: config.googleApiKey ? `${config.googleApiKey.substring(0, 7)}...` : 'not set'
     });
   } catch (error) {
     res.status(500).json({ status: 'degraded', error: error.message });
