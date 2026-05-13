@@ -19,7 +19,7 @@ export default function Header({ ingestionStatus, onIngest, onMenuToggle, onShow
         <div>
           <div className="header-title" style={{ fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: 700, letterSpacing: '-0.02em' }}>NewsAI</div>
           <div className="header-subtitle">
-            Intelligent News Analysis • RAG-Powered
+            Intelligent News Analysis • Developed by <strong>Tannu Yadav</strong>
             <button 
               onClick={onShowOverview}
               style={{ 
