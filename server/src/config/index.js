@@ -5,7 +5,9 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config(); // Load from default location first
+const envPath = path.resolve(__dirname, '../../.env');
+dotenv.config({ path: envPath });
 
 const config = {
   port: parseInt(process.env.PORT, 10) || 3001,
@@ -14,8 +16,8 @@ const config = {
   chunkSize: parseInt(process.env.CHUNK_SIZE, 10) || 800,
   chunkOverlap: parseInt(process.env.CHUNK_OVERLAP, 10) || 200,
   dataPath: path.resolve(__dirname, '../data'),
-  embeddingModel: 'gemini-embedding-001', // Hardcoded to bypass Vercel env var override
-  llmModel: 'gemini-2.5-flash', // Verified working model on v1beta
+  embeddingModel: 'gemini-embedding-001',
+  llmModel: 'gemini-2.5-flash',
   topK: 5,
   temperature: 0.3,
 };

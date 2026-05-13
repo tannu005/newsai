@@ -101,6 +101,12 @@ export async function getVectorCount() {
 async function persistStore() {
   if (!vectorStore) return;
 
+  // Skip persistence on Vercel (read-only filesystem)
+  if (process.env.VERCEL) {
+    console.log('💾 Skipping vector store persistence (Vercel environment)');
+    return;
+  }
+
   try {
     // Ensure directory exists
     await fs.mkdir(config.vectorStorePath, { recursive: true });

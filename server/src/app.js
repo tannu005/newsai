@@ -46,7 +46,9 @@ app.get('/api/health', async (req, res) => {
       llmModel: config.llmModel,
       env: process.env.NODE_ENV,
       isVercel: !!process.env.VERCEL,
-      apiKeyPrefix: config.googleApiKey ? `${config.googleApiKey.substring(0, 7)}...` : 'not set'
+      platform: process.env.VERCEL ? 'Vercel Serverless' : 'Local Node.js',
+      apiKeyPrefix: config.googleApiKey ? `${config.googleApiKey.substring(0, 7)}...` : 'not set',
+      inngestActive: !!(process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1')
     });
   } catch (error) {
     res.status(500).json({ status: 'degraded', error: error.message });

@@ -72,6 +72,12 @@ router.post('/', async (req, res) => {
 });
 
 async function appendToHistory(message) {
+  // Skip history persistence on Vercel as the filesystem is read-only
+  if (process.env.VERCEL) {
+    console.log('📝 Skipping history persistence (Vercel environment)');
+    return;
+  }
+
   try {
     let history = [];
     try {

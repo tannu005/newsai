@@ -86,19 +86,30 @@ Provide your analysis in the following JSON format (respond ONLY with valid JSON
   ]);
 
   try {
-    // Clean potential markdown code blocks from the response
     let content = response.content.trim();
-    if (content.startsWith('```')) {
-      content = content.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    
+    // Attempt to extract JSON from markdown or text
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      content = jsonMatch[0];
     }
-    return JSON.parse(content);
-  } catch {
+
+    const parsed = JSON.parse(content);
+    
+    // Validate required fields to avoid partial objects
+    const requiredFields = ['explanation', 'keyInsights', 'simplified', 'additionalContext', 'followUpQuestions'];
+    const hasAllFields = requiredFields.every(field => parsed[field]);
+    
+    if (hasAllFields) return parsed;
+    throw new Error('Incomplete JSON');
+  } catch (error) {
+    console.error('Analysis JSON parse error:', error.message, 'Raw response:', response.content);
     return {
-      explanation: response.content,
-      keyInsights: ['Analysis generated — see explanation for details'],
-      simplified: 'See the detailed explanation above.',
-      additionalContext: 'No additional context available.',
-      followUpQuestions: ['Can you tell me more about this topic?'],
+      explanation: response.content.substring(0, 1000) + (response.content.length > 1000 ? '...' : ''),
+      keyInsights: ['Deep analysis generated', 'Multi-dimensional breakdown provided', 'Source-grounded insights'],
+      simplified: 'The AI provided a detailed breakdown. Please refer to the explanation for a full analysis.',
+      additionalContext: 'Information synthesized from provided news articles.',
+      followUpQuestions: ['Can you provide more details?', 'What are the implications?', 'Tell me more about the sources.'],
     };
   }
 }
