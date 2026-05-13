@@ -94,3 +94,38 @@ export async function clearHistory() {
     await fs.writeFile(HISTORY_FILE, '[]', 'utf-8');
   }
 }
+
+/**
+ * Delete a specific session's history.
+ */
+export async function deleteSession(sessionId) {
+  if (!sessionId) return;
+
+  // 1. Memory
+  memoryHistory = memoryHistory.filter(m => m.sessionId !== sessionId);
+
+  // 2. MongoDB
+  if (mongoose.connection.readyState === 1) {
+    try {
+      await History.deleteMany({ sessionId });
+    } catch (err) {
+      console.error('MongoDB delete error:', err);
+    }
+  }
+
+  // 3. Local Disk
+  if (!process.env.VERCEL) {
+    try {
+      let history = [];
+      try {
+        const raw = await fs.readFile(HISTORY_FILE, 'utf-8');
+        history = JSON.parse(raw);
+      } catch { }
+      
+      const filtered = history.filter(m => m.sessionId !== sessionId);
+      await fs.writeFile(HISTORY_FILE, JSON.stringify(filtered, null, 2), 'utf-8');
+    } catch (err) {
+      console.error('FS delete error:', err);
+    }
+  }
+}

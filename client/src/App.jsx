@@ -18,6 +18,8 @@ export default function App() {
     analyzeMessage,
     startNewChat,
     switchSession,
+    deleteSession,
+    clearAllHistory,
     ingestData,
     setError,
   } = useChat();
@@ -52,6 +54,8 @@ export default function App() {
           currentSessionId={sessionId}
           onNewChat={handleNewChat}
           onSelectSession={handleSelectSession}
+          onDeleteSession={deleteSession}
+          onClearHistory={clearAllHistory}
           isOpen={sidebarOpen}
         />
 

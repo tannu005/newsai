@@ -150,6 +150,29 @@ export function useChat() {
     }
   }, [checkIngestionStatus]);
 
+  const deleteSession = useCallback(async (sid) => {
+    try {
+      await api.deleteSession(sid);
+      setSessions((prev) => prev.filter((s) => s.sessionId !== sid));
+      if (sessionId === sid) {
+        startNewChat();
+      }
+    } catch (err) {
+      setError('Failed to delete session: ' + err.message);
+    }
+  }, [sessionId, startNewChat]);
+
+  const clearAllHistory = useCallback(async () => {
+    try {
+      await api.clearHistory();
+      setSessions([]);
+      setMessages([]);
+      startNewChat();
+    } catch (err) {
+      setError('Failed to clear history: ' + err.message);
+    }
+  }, [startNewChat]);
+
   return {
     messages,
     isLoading,
@@ -161,6 +184,8 @@ export function useChat() {
     analyzeMessage,
     startNewChat,
     switchSession,
+    deleteSession,
+    clearAllHistory,
     ingestData,
     setError,
   };

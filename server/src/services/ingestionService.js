@@ -5,6 +5,16 @@ import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
 
+// Track ingestion progress globally
+export const ingestionProgress = {
+  status: 'idle',
+  processed: 0,
+  total: 0,
+  percentage: 0,
+  chunksCreated: 0,
+  lastUpdated: null
+};
+
 /**
  * Ingest the news dataset: load articles, chunk them, generate embeddings,
  * and store in the vector database.
@@ -13,6 +23,11 @@ import path from 'path';
  */
 export async function ingestDataset(forceReindex = false) {
   console.log('🚀 Starting dataset ingestion...');
+  
+  ingestionProgress.status = 'processing';
+  ingestionProgress.processed = 0;
+  ingestionProgress.percentage = 0;
+  ingestionProgress.lastUpdated = new Date().toISOString();
 
   // Always clear existing store before ingesting to prevent duplicates
   await clearStore();
@@ -21,6 +36,7 @@ export async function ingestDataset(forceReindex = false) {
   const datasetPath = path.resolve(config.dataPath, 'news_dataset.json');
   const raw = await fs.readFile(datasetPath, 'utf-8');
   const articles = JSON.parse(raw);
+  ingestionProgress.total = articles.length;
 
   console.log(`📰 Loaded ${articles.length} articles`);
 
@@ -61,12 +77,19 @@ export async function ingestDataset(forceReindex = false) {
   }
 
   console.log(`✂️ Created ${allDocuments.length} chunks from ${articles.length} articles`);
+  ingestionProgress.chunksCreated = allDocuments.length;
 
   // Batch add to vector store (with rate limiting for API)
   const BATCH_SIZE = 50;
   for (let i = 0; i < allDocuments.length; i += BATCH_SIZE) {
     const batch = allDocuments.slice(i, i + BATCH_SIZE);
     await addDocuments(batch);
+    
+    // Update progress
+    ingestionProgress.processed = Math.min(i + BATCH_SIZE, allDocuments.length);
+    ingestionProgress.percentage = Math.round((ingestionProgress.processed / allDocuments.length) * 100);
+    ingestionProgress.lastUpdated = new Date().toISOString();
+
     console.log(`📊 Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(allDocuments.length / BATCH_SIZE)}`);
 
     // Small delay between batches to respect API rate limits
@@ -76,6 +99,9 @@ export async function ingestDataset(forceReindex = false) {
   }
 
   console.log('✅ Ingestion complete!');
+  ingestionProgress.status = 'complete';
+  ingestionProgress.percentage = 100;
+  ingestionProgress.lastUpdated = new Date().toISOString();
 
   return {
     documentsProcessed: articles.length,

@@ -3,7 +3,8 @@ import { Database, Menu, Zap } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Header({ ingestionStatus, onIngest, onMenuToggle, onShowOverview }) {
-  const isProcessing = ingestionStatus.status === 'processing';
+  const isProcessing = ingestionStatus.status === 'processing' || ingestionStatus.progress?.status === 'processing';
+  const progressPercent = ingestionStatus.progress?.percentage || 0;
   const isReady = ingestionStatus.isPopulated;
 
   return (
@@ -51,13 +52,20 @@ export default function Header({ ingestionStatus, onIngest, onMenuToggle, onShow
           <span className={`status-dot ${isReady ? 'ready' : isProcessing ? 'processing' : 'idle'}`} style={{ 
             backgroundColor: isReady ? 'var(--accent-gold)' : isProcessing ? 'var(--accent-amber)' : 'var(--text-muted)' 
           }} />
-          <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold)', fontWeight: 600 }}>
-            {isReady
-              ? `${ingestionStatus.vectorCount || '✓'} vectors${ingestionStatus.articleCount ? ` • ${ingestionStatus.articleCount} articles` : ''}`
-              : isProcessing
-              ? 'Processing...'
-              : 'Not indexed'}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold)', fontWeight: 600 }}>
+              {isProcessing
+                ? `Processing ${progressPercent}%`
+                : isReady
+                ? `${ingestionStatus.vectorCount || '✓'} vectors`
+                : 'Not indexed'}
+            </span>
+            {isProcessing && (
+              <div style={{ width: '60px', height: '3px', background: 'rgba(255,215,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{ width: `${progressPercent}%`, height: '100%', background: 'var(--accent-gold)', transition: 'width 0.3s ease' }} />
+              </div>
+            )}
+          </div>
         </div>
         <button
           className="ingest-btn"

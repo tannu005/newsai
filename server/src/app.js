@@ -13,6 +13,9 @@ connectDB();
 
 const app = express();
 
+// Body parsing middleware must be registered BEFORE Inngest so Inngest can read the request body
+app.use(express.json({ limit: '10mb' }));
+
 // Only mount Inngest if we have the signing key (production) or are in dev mode
 // IMPORTANT: Mount Inngest BEFORE express.json() to allow it to handle raw bodies for signature verification
 if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
@@ -38,9 +41,8 @@ if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
   }
 }
 
-// Middleware
+// Other Middleware
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
 
 // API Routes
 app.use('/api/chat', chatRouter);

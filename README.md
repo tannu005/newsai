@@ -18,8 +18,8 @@ This project has been meticulously designed for **Recruiter Review**, featuring 
 ## 🚀 Core Features
 
 ### 1. RAG-Powered Intelligence
-- **Semantic Search**: Uses Google's `text-embedding-004` to find the most relevant news snippets.
-- **Grounded Answers**: The AI (Gemini 1.5 Flash) answers *only* using the provided dataset context.
+- **Semantic Search**: Uses Google's `gemini-embedding-001` to find the most relevant news snippets.
+- **Grounded Answers**: The AI (Gemini 2.0 Flash) answers *only* using the provided dataset context.
 - **Source Citations**: Every response includes interactive cards linking back to the original news articles (Reuters, Bloomberg, etc.).
 
 ### 2. Deep Analysis Engine (Bonus Feature)
@@ -88,7 +88,7 @@ Every AI response features an **"Analyze with AI"** button that performs a multi
 | **Backend** | Node.js, Express.js |
 | **Database** | **MongoDB** (via Mongoose) |
 | **AI / RAG** | LangChain.js, Google Gemini 2.0 Flash |
-| **Embeddings** | Gemini `text-embedding-004` |
+| **Embeddings** | Gemini `gemini-embedding-001` |
 | **Vector Store** | MemoryVectorStore (with JSON/Disk persistence) |
 | **Styling** | Vanilla CSS (Glassmorphic design system) |
 

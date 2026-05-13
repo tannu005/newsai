@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getHistory, clearHistory } from '../services/historyService.js';
+import { getHistory, clearHistory, deleteSession } from '../services/historyService.js';
 
 const router = Router();
 
@@ -61,6 +61,21 @@ router.delete('/', async (req, res) => {
     res.json({ status: 'cleared' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to clear history' });
+  }
+});
+
+/**
+ * DELETE /api/history/:sessionId
+ * Deletes a specific chat session.
+ */
+router.delete('/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    await deleteSession(sessionId);
+    res.json({ status: 'deleted', sessionId });
+  } catch (error) {
+    console.error('Delete session error:', error);
+    res.status(500).json({ error: 'Failed to delete session' });
   }
 });
 

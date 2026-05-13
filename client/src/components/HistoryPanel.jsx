@@ -1,7 +1,7 @@
 import React from 'react';
-import { MessageSquarePlus, Clock, Cpu, TrendingUp, HeartPulse, Search } from 'lucide-react';
+import { MessageSquarePlus, Clock, Cpu, TrendingUp, HeartPulse, Search, Trash2, X } from 'lucide-react';
 
-export default function HistoryPanel({ sessions, currentSessionId, onNewChat, onSelectSession, isOpen }) {
+export default function HistoryPanel({ sessions, currentSessionId, onNewChat, onSelectSession, onDeleteSession, onClearHistory, isOpen }) {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -38,6 +38,18 @@ export default function HistoryPanel({ sessions, currentSessionId, onNewChat, on
       </button>
 
       <div className="session-list">
+        {sessions.length > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 12px 10px 12px', borderBottom: '1px solid var(--glass-border)', marginBottom: '10px' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Recent Chats</span>
+            <button 
+              onClick={() => { if(window.confirm('Clear all chat history?')) onClearHistory(); }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem' }}
+              title="Clear All History"
+            >
+              <Trash2 size={12} /> Clear
+            </button>
+          </div>
+        )}
         {sessions.length === 0 ? (
           <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             No conversations yet. Start chatting!
@@ -47,15 +59,40 @@ export default function HistoryPanel({ sessions, currentSessionId, onNewChat, on
             <div
               key={session.sessionId}
               className={`session-item ${session.sessionId === currentSessionId ? 'active' : ''}`}
+              style={{ position: 'relative' }}
               onClick={() => onSelectSession(session.sessionId)}
             >
-              <div className="session-item-header" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="session-item-header" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingRight: '24px' }}>
                 <span className="category-icon" style={{ color: 'var(--accent-gold)', opacity: 0.7 }}>
                   {getCategoryIcon(session.title)}
                 </span>
                 <div className="session-item-title">{session.title}</div>
               </div>
               <div className="session-item-time" style={{ marginLeft: '22px' }}>{formatTime(session.lastMessage)}</div>
+              
+              <button 
+                className="delete-session-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if(window.confirm('Delete this session?')) onDeleteSession(session.sessionId);
+                }}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
+                  padding: '4px'
+                }}
+                title="Delete Session"
+              >
+                <X size={14} />
+              </button>
             </div>
           ))
         )}

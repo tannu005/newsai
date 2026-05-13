@@ -55,6 +55,10 @@ export const api = {
   clearHistory: () =>
     request('/history', { method: 'DELETE' }),
 
+  /** Delete a specific session */
+  deleteSession: (sessionId) =>
+    request(`/history/${sessionId}`, { method: 'DELETE' }),
+
   /** Health check */
   health: () => request('/health'),
 };

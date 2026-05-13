@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isStorePopulated, getStoreStats } from '../services/vectorStoreService.js';
-import { ingestDataset } from '../services/ingestionService.js';
+import { ingestDataset, ingestionProgress } from '../services/ingestionService.js';
 
 const router = Router();
 
@@ -54,7 +54,10 @@ router.post('/', async (req, res) => {
 router.get('/status', async (req, res) => {
   try {
     const stats = await getStoreStats();
-    res.json(stats);
+    res.json({
+      ...stats,
+      progress: ingestionProgress
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get status' });
   }

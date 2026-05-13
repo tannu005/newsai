@@ -203,6 +203,16 @@ body {
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
+.session-item:hover .delete-session-btn {
+  opacity: 1 !important;
+}
+
+.delete-session-btn:hover {
+  color: var(--accent-rose) !important;
+  background: rgba(220, 20, 60, 0.1) !important;
+  border-radius: 4px;
+}
+
 .session-item-title {
   font-size: 0.875rem;
   color: var(--text-primary);

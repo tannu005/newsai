@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Sparkles, AlertCircle, RefreshCw, User, Bot } from 'lucide-react';
+import { Send, Sparkles, AlertCircle, RefreshCw, User, Bot, Copy, Check } from 'lucide-react';
 import SourceCard from './SourceCard';
 import AnalyzeModal from './AnalyzeModal';
 
@@ -13,6 +13,7 @@ const SUGGESTED_QUESTIONS = [
 
 export default function ChatInterface({ messages, isLoading, error, onSend, onAnalyze, onClearError }) {
   const [input, setInput] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
   const [analyzeModal, setAnalyzeModal] = useState({ open: false, loading: false, analysis: null });
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -62,6 +63,12 @@ export default function ChatInterface({ messages, isLoading, error, onSend, onAn
   const handleSuggested = (q) => {
     onSend(q);
   };
+
+  const handleCopy = useCallback((text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  }, []);
 
   return (
     <>
@@ -132,7 +139,7 @@ export default function ChatInterface({ messages, isLoading, error, onSend, onAn
                     </div>
                   )}
 
-                  {/* Analyze button for AI messages */}
+                  {/* Actions for AI messages */}
                   {msg.role === 'assistant' && msg.content && (
                     <div className="message-actions">
                       <button 
@@ -142,6 +149,15 @@ export default function ChatInterface({ messages, isLoading, error, onSend, onAn
                       >
                         <Sparkles size={13} />
                         Analyze with AI
+                      </button>
+                      <button 
+                        className="analyze-btn" 
+                        onClick={() => handleCopy(msg.content, msg.id)}
+                        title="Copy to clipboard"
+                        style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', borderColor: 'rgba(255,255,255,0.1)' }}
+                      >
+                        {copiedId === msg.id ? <Check size={13} color="var(--accent-gold)" /> : <Copy size={13} />}
+                        {copiedId === msg.id ? 'Copied' : 'Copy'}
                       </button>
                     </div>
                   )}

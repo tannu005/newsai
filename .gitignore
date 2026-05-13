@@ -15,6 +15,13 @@ build/
 
 # Chat history
 server/src/data/history.json
+server/history.json
+
+# Test scripts & Scratch
+server/list_models_detailed.js
+server/test_fetch.js
+server/src/test-key-new.js
+server/scratch/
 
 # IDE
 .vscode/
