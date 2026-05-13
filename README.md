@@ -19,7 +19,7 @@ This project has been meticulously designed for **Recruiter Review**, featuring 
 
 ### 1. RAG-Powered Intelligence
 - **Semantic Search**: Uses Google's `gemini-embedding-001` to find the most relevant news snippets.
-- **Grounded Answers**: The AI (Gemini 2.0 Flash) answers *only* using the provided dataset context.
+- **Grounded Answers**: The AI (Gemini 2.5 Flash Lite) answers *only* using the provided dataset context.
 - **Source Citations**: Every response includes interactive cards linking back to the original news articles (Reuters, Bloomberg, etc.).
 
 ### 2. Deep Analysis Engine (Bonus Feature)
@@ -87,36 +87,58 @@ Every AI response features an **"Analyze with AI"** button that performs a multi
 | **3D Graphics** | Three.js (Interactive Robotic Assistant) |
 | **Backend** | Node.js, Express.js |
 | **Database** | **MongoDB** (via Mongoose) |
-| **AI / RAG** | LangChain.js, Google Gemini 2.0 Flash |
+| **AI / RAG** | LangChain.js, Google Gemini 2.5 Flash Lite |
 | **Embeddings** | Gemini `gemini-embedding-001` |
 | **Vector Store** | MemoryVectorStore (with JSON/Disk persistence) |
 | **Styling** | Vanilla CSS (Glassmorphic design system) |
 
 ---
 
-## ⚙️ Setup & Installation
+## ⚙️ Detailed Setup & Installation Procedure
 
-### 1. Prerequisites
-- **Node.js 18+**
-- **Google Gemini API Key** (from [AI Studio](https://aistudio.google.com/))
-- **MongoDB URI** (Optional, for production history persistence)
+This project uses a monorepo structure. Follow these step-by-step instructions to get everything running locally, including the Inngest background worker.
 
-### 2. Backend Setup
+### Step 1: Clone and Install Dependencies
+Open your terminal and clone the repository, then install the root dependencies.
 ```bash
-cd server
+git clone https://github.com/tannu005/news-ai-premium-dashboard.git
+cd news-ai-premium-dashboard
 npm install
-cp .env.example .env
-# Fill in GOOGLE_API_KEY and MONGODB_URI (if using)
-npm run dev
 ```
 
-### 3. Frontend Setup
-```bash
-cd client
-npm install
-npm run dev
-```
+### Step 2: Configure Environment Variables
+You need a Google Gemini API Key for the RAG and LLM functionality to work.
+1. Navigate to the `server` directory: `cd server`
+2. Copy the example environment file: `cp .env.example .env` (or rename it manually).
+3. Open `.env` and add your keys:
+   - `GOOGLE_API_KEY=your_gemini_key_here`
+   - `MONGODB_URI=your_mongodb_connection_string` *(Optional: If left blank, chat history will gracefully fall back to local disk/memory).*
 
+### Step 3: Run the Application (Frontend & Backend)
+We use `concurrently` to run both the frontend and backend with a single command from the root directory.
+1. Go back to the root directory: `cd ..`
+2. Start the development servers: `npm run dev`
+*(This will start the backend Express server on `http://localhost:3001` and the React Vite frontend on `http://localhost:5173`).*
+
+### Step 4: Start the Inngest Local Dev Server
+The application uses **Inngest** for reliable background dataset ingestion.
+1. Open a **new terminal window**.
+2. Make sure you are in the root directory: `cd news-ai-premium-dashboard`
+3. Run the Inngest dev server: `npm run inngest`
+*(This launches the Inngest dashboard at `http://localhost:8288` and connects to your backend).*
+
+### Step 5: Ingest the Data
+1. Open your browser and navigate to `http://localhost:5173`.
+2. Click the **"Ingest Data"** button in the top header.
+3. You will see a real-time progress bar. The backend has securely offloaded the chunking and vectorization task to Inngest!
+4. Once it reaches 100% and displays the vector count, the chatbot is ready.
+
+### 🚀 Production Deployment (Vercel)
+This project is configured for seamless deployment on Vercel. 
+1. Connect your GitHub repository to Vercel.
+2. Vercel will automatically detect the root `package.json` build scripts.
+3. Add `GOOGLE_API_KEY` and `MONGODB_URI` to your Vercel Environment Variables.
+4. **Note:** The `vercel.json` file is already pre-configured to bundle the `news_dataset.json` correctly for the serverless environment, ensuring no 500 errors occur in production!
 ---
 
 ## 📄 Dataset

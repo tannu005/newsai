@@ -4,7 +4,7 @@ import config from '../config/index.js';
 let llmInstance = null;
 
 /**
- * Get or create a singleton LLM instance (Gemini 2.0 Flash).
+ * Get or create a singleton LLM instance (Gemini 2.5 Flash Lite).
  * Uses low temperature for factual, grounded responses.
  */
 export function getLLM() {
@@ -47,7 +47,7 @@ CONTEXT FROM NEWS ARTICLES:
 ${context}`;
 
   let response;
-  const allModels = [config.llmModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
+  const allModels = [config.llmModel, 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
   // Deduplicate
   const modelsToTry = [...new Set(allModels)];
 
@@ -106,7 +106,7 @@ ${context}`;
  */
 export async function analyzeResponse(originalQuery, originalAnswer, context) {
   const primaryLlm = getLLM();
-  const allModels = [config.llmModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
+  const allModels = [config.llmModel, 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
   const modelsToTry = [...new Set(allModels)];
   
   const analysisPrompt = `You are an expert news analyst. Analyze the following chatbot response and provide a structured deep-dive analysis.

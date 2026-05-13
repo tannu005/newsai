@@ -17,7 +17,7 @@ const config = {
   chunkOverlap: parseInt(process.env.CHUNK_OVERLAP, 10) || 200,
   dataPath: path.resolve(__dirname, '../data'),
   embeddingModel: process.env.EMBEDDING_MODEL || 'gemini-embedding-001',
-  llmModel: process.env.LLM_MODEL || 'gemini-2.0-flash',
+  llmModel: process.env.LLM_MODEL || 'gemini-2.5-flash-lite',
   topK: 5,
   temperature: 0.3,
 };
