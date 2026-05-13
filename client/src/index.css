@@ -581,9 +581,12 @@ code {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s var(--ease-out);
-  max-width: 280px;
+  max-width: 300px;
   flex: 1;
-  min-width: 200px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .source-card:hover {
@@ -607,9 +610,12 @@ code {
 .source-card-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
   font-size: 0.72rem;
   color: var(--text-muted);
+  margin-top: auto;
 }
 
 .source-badge {

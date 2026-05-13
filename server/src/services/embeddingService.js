@@ -16,7 +16,7 @@ export function getEmbeddings() {
     
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: config.googleApiKey,
-      model: 'gemini-embedding-001',
+      model: 'gemini-embedding-2',
       taskType: TaskType.RETRIEVAL_DOCUMENT,
     });
 
@@ -37,8 +37,8 @@ export function getEmbeddings() {
         for (const text of texts) {
           const v = await embeddings.embedQuery(text);
           vectors.push(v);
-          // 4-second delay to stay under the 15 RPM free-tier limit
-          await new Promise(resolve => setTimeout(resolve, 4000));
+          // 2-second delay to stay under the 30 RPM limit for newer models
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
         return vectors;
       }
@@ -59,7 +59,7 @@ export function getQueryEmbeddings() {
   }
   return new GoogleGenerativeAIEmbeddings({
     apiKey: config.googleApiKey,
-    model: 'gemini-embedding-001',
+    model: 'gemini-embedding-2',
     taskType: TaskType.RETRIEVAL_QUERY,
   });
 }

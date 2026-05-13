@@ -54,6 +54,7 @@ router.post('/', async (req, res) => {
 router.get('/status', async (req, res) => {
   try {
     const stats = await getStoreStats();
+    console.log(`🔍 Status Poll: ${ingestionProgress.status} - ${ingestionProgress.percentage}% - ${ingestionProgress.currentStep || 'N/A'}`);
     res.json({
       ...stats,
       progress: ingestionProgress
