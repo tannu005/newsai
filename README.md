@@ -1,4 +1,5 @@
 # NewsAI: Premium Intelligent RAG Dashboard
+Developed by **Tannu Yadav**
 
 NewsAI is a high-performance RAG (Retrieval-Augmented Generation) platform designed to synthesize and analyze current news datasets using Gemini 2.5 Flash Lite and Vector Embeddings. It features a stunning Three.js-powered 3D immersive UI and a robust background ingestion pipeline powered by Inngest.
 
@@ -28,8 +29,8 @@ NewsAI is a high-performance RAG (Retrieval-Augmented Generation) platform desig
 
 ### 2. Clone and Install
 ```bash
-git clone https://github.com/your-username/news-ai-premium-dashboard.git
-cd news-ai-premium-dashboard
+git clone https://github.com/tannu005/newsai.git
+cd newsai
 npm install
 ```
 
@@ -70,7 +71,7 @@ This project is pre-configured for Vercel.
 ---
 
 ## 📺 Demo Video
-[Click here to watch the full walkthrough (3-5 mins)](https://link-to-your-demo-video)
+[Click here to watch the full walkthrough (5 mins)](https://github.com/tannu005/newsai/blob/main/demo_video.md)
 
 ## 📄 License
-MIT License. Created by [Your Name/GitHub].
+MIT License. Created by [Tannu Yadav](https://github.com/tannu005).
