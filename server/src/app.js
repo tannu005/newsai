@@ -1,10 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import config from './config/index.js';
+import connectDB from './config/db.js';
 import chatRouter from './routes/chat.js';
 import ingestRouter from './routes/ingest.js';
 import historyRouter from './routes/history.js';
 import { getVectorCount } from './services/vectorStoreService.js';
+
+// Connect to Database
+connectDB();
 
 const app = express();
 
@@ -38,15 +42,15 @@ app.get('/api/health', async (req, res) => {
   try {
     const vectorCount = await getVectorCount();
     res.json({
-      status: 'ok',
+      status: 'healthy',
       timestamp: new Date().toISOString(),
       hasApiKey: !!config.googleApiKey,
       vectorCount: vectorCount,
       embeddingModel: config.embeddingModel,
       llmModel: config.llmModel,
       env: process.env.NODE_ENV,
-      isVercel: !!process.env.VERCEL,
-      platform: process.env.VERCEL ? 'Vercel Serverless' : 'Local Node.js',
+      db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      platform: process.env.VERCEL ? 'Vercel (Serverless)' : 'Local/Standard',
       apiKeyPrefix: config.googleApiKey ? `${config.googleApiKey.substring(0, 7)}...` : 'not set',
       inngestActive: !!(process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1')
     });

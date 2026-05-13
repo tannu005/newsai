@@ -1,78 +1,38 @@
-# 🧠 NewsAI — Intelligent News Chatbot
+# 🧠 NewsAI — Premium Intelligent News Assistant
 
-A full-stack, AI-powered news chatbot that uses **Retrieval-Augmented Generation (RAG)** to answer questions from a curated news dataset. Built with React, Express.js, LangChain, and Google Gemini.
+A professional, full-stack AI-powered news platform that uses **Retrieval-Augmented Generation (RAG)** to provide grounded, expert-level answers from a curated news dataset.
 
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs) ![LangChain](https://img.shields.io/badge/LangChain-0.3-1C3C3C) ![Gemini](https://img.shields.io/badge/Gemini_2.0_Flash-4285F4?logo=google) ![Three.js](https://img.shields.io/badge/Three.js-R169-000000?logo=threedotjs)
-
----
-
-## ✨ Features
-
-## 🎨 Premium Redesign (Black & Gold Edition)
-- **Luxury Theme**: Implemented a famous Rich Black (#0D0D0D) and Gold (#FFD700) color palette.
-- **3D Metallic AI Assistant**: Custom-built robotic companion with realistic steel/copper textures and interactive GSAP animations.
-- **Matte Gold Typography**: Professional Inter/Roboto font hierarchy with gold/copper keyword highlighting.
-- **Pill Badge UI**: Redesigned banner and history panel with modern pill badges and floating gold buttons.
-- **Deep Analysis Engine**: Interactive modal system for multi-dimensional news breakdown.
-- **RAG-Powered Chat** — Grounded answers from real news articles with source citations
-- **Chat History** — Persistent session management with sidebar navigation
-- **Real Data Ingestion** — Semantic chunking + vector embeddings from 30 curated news articles
-- **Responsive Design** — Premium dark cyberpunk theme, works on mobile/tablet/desktop
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs) ![MongoDB](https://img.shields.io/badge/MongoDB-Persisted-47A248?logo=mongodb) ![Gemini](https://img.shields.io/badge/Gemini_2.0_Flash-4285F4?logo=google) ![Three.js](https://img.shields.io/badge/Three.js-Metallic-000000?logo=threedotjs)
 
 ---
 
-## 🚀 Quick Start
+## 🎨 Design Philosophy: Black & Gold Edition
+This project has been meticulously designed for **Recruiter Review**, featuring a luxury dark aesthetic that feels premium and state-of-the-art:
+- **Luxury Theme**: A "Famous Rich Black" (#0D0D0D) and Matte Gold (#FFD700) color palette.
+- **3D Metallic Assistant**: An interactive 3D robot companion with realistic steel/copper textures.
+- **Glassmorphic UI**: High-end translucent panels with subtle gold borders and glow effects.
+- **Micro-Animations**: Framer Motion transitions and GSAP-powered hover effects.
 
-### Prerequisites
-- **Node.js 18+** installed
-- **Google Gemini API Key** — free from [Google AI Studio](https://aistudio.google.com/)
+---
 
-### 1. Clone & Install
+## 🚀 Core Features
 
-```bash
-cd news-chatbot
+### 1. RAG-Powered Intelligence
+- **Semantic Search**: Uses Google's `text-embedding-004` to find the most relevant news snippets.
+- **Grounded Answers**: The AI (Gemini 1.5 Flash) answers *only* using the provided dataset context.
+- **Source Citations**: Every response includes interactive cards linking back to the original news articles (Reuters, Bloomberg, etc.).
 
-# Install backend
-cd server
-npm install
-cp .env.example .env
-# Edit .env → add your GOOGLE_API_KEY
+### 2. Deep Analysis Engine (Bonus Feature)
+Every AI response features an **"Analyze with AI"** button that performs a multi-step workflow:
+- **Detailed Explanation**: Nuanced breakdown of the news event.
+- **Key Insights**: Auto-extracted bullet points of critical information.
+- **Simplified Version**: Easy-to-understand summary for general audiences.
+- **Additional Context**: Broader background information not in the original answer.
+- **Follow-up Questions**: Smart suggestions to continue the exploration.
 
-# Install frontend
-cd ../client
-npm install
-```
-
-### 2. Configure
-
-Edit `server/.env`:
-```env
-GOOGLE_API_KEY=your_gemini_api_key_here
-```
-
-### 3. Run
-
-Open **two terminals**:
-
-```bash
-# Terminal 1 — Backend
-cd server
-npm run dev
-
-# Terminal 2 — Frontend
-cd client
-npm run dev
-```
-
-Open **http://localhost:5173** in your browser.
-
-### 4. Ingest Data
-
-Click the **"Ingest Data"** button in the header. This will:
-1. Load 30 news articles from the bundled dataset
-2. Chunk them into semantic segments
-3. Generate vector embeddings via Gemini
-4. Store them for similarity search
+### 3. Professional History Management
+- **Hybrid Persistence**: Supports MongoDB (Production), JSON Files (Local), and In-Memory Fallbacks (Vercel).
+- **Session Grouping**: Automatically organizes your chats into named sessions based on your first question.
 
 ---
 
@@ -83,99 +43,77 @@ Click the **"Ingest Data"** button in the header. This will:
 │                   Frontend                       │
 │  React + Three.js + Framer Motion               │
 │  ┌──────────┐ ┌───────────┐ ┌──────────────┐   │
-│  │ 3D Scene │ │ Chat UI   │ │ History Panel│   │
+│  │ 3D Robot │ │ Chat UI   │ │ History Panel│   │
 │  └──────────┘ └─────┬─────┘ └──────────────┘   │
 │                     │                            │
 │              fetch('/api/...')                    │
+|                     ▼                            |
 ├─────────────────────┼───────────────────────────┤
 │                   Backend                        │
-│  Express.js + LangChain                         │
+│  Express.js + LangChain + Mongoose              │
 │  ┌──────────┐ ┌─────┴─────┐ ┌──────────────┐   │
-│  │ Ingest   │ │ RAG Svc   │ │ History API  │   │
-│  │ Pipeline │ │           │ │              │   │
+│  │ Ingest   │ │ RAG Svc   │ │ History Svc  │   │
+│  │ Pipeline │ │ (Gemini)  │ │ (Mongo/JSON) │   │
 │  └────┬─────┘ └─────┬─────┘ └──────┬───────┘   │
 │       │             │               │            │
 │  ┌────┴─────┐ ┌─────┴─────┐ ┌──────┴───────┐   │
-│  │ Chunker  │ │ Vector    │ │ JSON File    │   │
-│  │ + Embed  │ │ Store     │ │ Storage      │   │
+│  │ Chunker  │ │ Vector    │ │ MongoDB /    │   │
+│  │ + Embed  │ │ Store     │ │ history.json │   │
 │  └──────────┘ └───────────┘ └──────────────┘   │
-│                     │                            │
-│              Gemini 2.0 Flash                    │
-│         (Embeddings + Generation)                │
 └─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📡 API Endpoints
+## 📡 API Reference
 
 | Method | Endpoint | Description |
 |:-------|:---------|:------------|
-| `POST` | `/api/chat` | Send query → get RAG answer + sources |
-| `POST` | `/api/ingest` | Trigger dataset ingestion pipeline |
-| `GET` | `/api/ingest/status` | Check ingestion status |
-| `GET` | `/api/history` | Fetch chat history (with session grouping) |
-| `DELETE` | `/api/history` | Clear all chat history |
-| `GET` | `/api/health` | Health check |
+| `POST` | `/api/chat` | Send question → get RAG answer + sources |
+| `POST` | `/api/ingest` | Trigger dataset ingestion and embedding |
+| `GET` | `/api/history` | Fetch chat history with session grouping |
+| `DELETE`| `/api/history` | Clear all history |
+| `GET` | `/api/health` | Diagnostic check (API status, DB status, Model) |
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Setup & Installation
 
-| Layer | Technology |
-|:------|:-----------|
-| Frontend | React 18, Vite, React Three Fiber, Framer Motion, Lucide Icons |
-| Design | Clean Modern UI, Navy/Teal Theme (#0A192F / #14B8A6) |
-| 3D Graphics | Three.js, @react-three/drei (Ledger Background) |
-| Backend | Node.js, Express.js |
-| AI/RAG | LangChain.js, Google Gemini 1.5 Flash |
-| Embeddings | Gemini text-embedding-004 |
-| Vector Store | LangChain MemoryVectorStore (JSON persistence) |
-| Styling | Vanilla CSS (Professional card-based layout) |
+### 1. Prerequisites
+- **Node.js 18+**
+- **Google Gemini API Key** (from [AI Studio](https://aistudio.google.com/))
+- **MongoDB URI** (Optional, for production history persistence)
 
----
-
-## 📁 Project Structure
-
-```
-news-chatbot/
-├── client/                     # React frontend
-│   ├── src/
-│   │   ├── components/         # UI components
-│   │   ├── hooks/useChat.js    # Chat state management
-│   │   ├── services/api.js     # API client
-│   │   ├── App.jsx             # Root component
-│   │   └── index.css           # Design system
-│   └── vite.config.js
-├── server/                     # Express backend
-│   ├── src/
-│   │   ├── routes/             # API route handlers
-│   │   ├── services/           # RAG pipeline services
-│   │   ├── data/               # News dataset + history
-│   │   └── config/             # Environment config
-│   └── .env.example
-└── README.md
+### 2. Backend Setup
+```bash
+cd server
+npm install
+cp .env.example .env
+# Fill in GOOGLE_API_KEY and MONGODB_URI (if using)
+npm run dev
 ```
 
----
-
-## 🚢 Deployment
-
-### Frontend (Vercel)
+### 3. Frontend Setup
 ```bash
 cd client
-npm run build
-# Deploy dist/ to Vercel
+npm install
+npm run dev
 ```
-
-### Backend (Render)
-- Set root directory to `server`
-- Build command: `npm install`
-- Start command: `npm start`
-- Add `GOOGLE_API_KEY` environment variable
 
 ---
 
-## 📜 License
+## 📄 Dataset
+The application comes bundled with a curated dataset of 30 modern news articles covering:
+- **Technology** (OpenAI, Quantum Computing, SpaceX)
+- **Business** (Federal Reserve, EV Market, Supply Chains)
+- **Science** (Green Hydrogen, James Webb Telescope)
+- **Health** (Alzheimer's breakthroughs, CRISPR therapy)
 
-MIT License — feel free to use, modify, and distribute.
+---
+
+## 👨‍💻 Author
+**Yogesh Pannu** — Full-Stack & GenAI Developer
+
+---
+## 📜 License
+MIT

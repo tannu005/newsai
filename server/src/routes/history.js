@@ -1,10 +1,7 @@
 import { Router } from 'express';
-import fs from 'fs/promises';
-import path from 'path';
-import config from '../config/index.js';
+import { getHistory, clearHistory } from '../services/historyService.js';
 
 const router = Router();
-const HISTORY_FILE = path.resolve(config.dataPath, 'history.json');
 
 /**
  * GET /api/history
@@ -13,18 +10,7 @@ const HISTORY_FILE = path.resolve(config.dataPath, 'history.json');
 router.get('/', async (req, res) => {
   try {
     const { sessionId } = req.query;
-    let history = [];
-
-    try {
-      const raw = await fs.readFile(HISTORY_FILE, 'utf-8');
-      history = JSON.parse(raw);
-    } catch {
-      // No history file yet
-    }
-
-    if (sessionId) {
-      history = history.filter((msg) => msg.sessionId === sessionId);
-    }
+    const history = await getHistory(sessionId);
 
     // Group messages by session for the history panel
     const sessions = {};
@@ -39,7 +25,9 @@ router.get('/', async (req, res) => {
         };
       }
       sessions[sid].messages.push(msg);
-      sessions[sid].lastMessage = msg.timestamp;
+      if (new Date(msg.timestamp) > new Date(sessions[sid].lastMessage)) {
+        sessions[sid].lastMessage = msg.timestamp;
+      }
     }
 
     // Get the first user message as session title
@@ -68,7 +56,7 @@ router.get('/', async (req, res) => {
  */
 router.delete('/', async (req, res) => {
   try {
-    await fs.writeFile(HISTORY_FILE, '[]', 'utf-8');
+    await clearHistory();
     res.json({ status: 'cleared' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to clear history' });

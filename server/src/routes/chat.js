@@ -1,12 +1,10 @@
 import { Router } from 'express';
 import { runRAGPipeline, runAnalysisPipeline } from '../services/ragService.js';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs/promises';
-import path from 'path';
+import { appendToHistory } from '../services/historyService.js';
 import config from '../config/index.js';
 
 const router = Router();
-const HISTORY_FILE = path.resolve(config.dataPath, 'history.json');
 
 /**
  * POST /api/chat
@@ -70,27 +68,5 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to process chat request', details: error.message });
   }
 });
-
-async function appendToHistory(message) {
-  // Skip history persistence on Vercel as the filesystem is read-only
-  if (process.env.VERCEL) {
-    console.log('📝 Skipping history persistence (Vercel environment)');
-    return;
-  }
-
-  try {
-    let history = [];
-    try {
-      const raw = await fs.readFile(HISTORY_FILE, 'utf-8');
-      history = JSON.parse(raw);
-    } catch {
-      // File doesn't exist yet
-    }
-    history.push(message);
-    await fs.writeFile(HISTORY_FILE, JSON.stringify(history, null, 2), 'utf-8');
-  } catch (error) {
-    console.error('Failed to save history:', error);
-  }
-}
 
 export default router;

@@ -17,6 +17,7 @@
     "express": "^4.21.0",
     "inngest": "^4.3.0",
     "langchain": "^0.3.0",
+    "mongoose": "^9.6.2",
     "uuid": "^10.0.0"
   }
 }
