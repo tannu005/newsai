@@ -14,7 +14,7 @@ export default function ProjectOverviewModal({ isOpen, onClose }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Cpu size={20} color="var(--accent-gold)" />
-            <h2 style={{ color: 'var(--accent-gold)' }}>System Architecture & Tech Stack</h2>
+            <h2 style={{ color: 'var(--accent-gold)' }}>System Implementation • Developed by Tannu Yadav</h2>
           </div>
           <button className="modal-close" onClick={onClose}>
             <X size={18} />
@@ -55,31 +55,25 @@ export default function ProjectOverviewModal({ isOpen, onClose }) {
               </ul>
             </div>
 
-            {/* RAG Pipeline */}
+            {/* Implementation Strategy */}
+            <div className="tech-section" style={{ gridColumn: '1 / -1', background: 'rgba(255, 255, 255, 0.02)', padding: '16px', borderRadius: '12px' }}>
+              <h3 style={{ fontSize: '1rem', color: 'var(--accent-gold)', marginBottom: '10px' }}>Step-by-Step Implementation</h3>
+              <ol style={{ paddingLeft: '20px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <li style={{ marginBottom: '6px' }}><strong>Data Pipeline Setup:</strong> Built an event-driven ingestion system using Inngest to handle long-running indexing tasks without blocking the UI.</li>
+                <li style={{ marginBottom: '6px' }}><strong>Quota Resilience:</strong> Implemented a "Sequential Fallback" strategy with specific delays (2-4s) to bypass Gemini API Free Tier rate limits (1000 req/day).</li>
+                <li style={{ marginBottom: '6px' }}><strong>RAG Orchestration:</strong> Used LangChain to connect Gemini 2.5 Flash Lite with a local vector index, ensuring AI responses are grounded in the curated news dataset.</li>
+                <li style={{ marginBottom: '6px' }}><strong>Analytical Layer:</strong> Developed a dedicated "AI Analyzer" pipeline that extracts key insights, executive summaries, and follow-up questions from retrieved news chunks.</li>
+              </ol>
+            </div>
+
+            {/* Next Steps */}
             <div className="tech-section" style={{ gridColumn: '1 / -1' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <Search size={18} color="var(--accent-gold)" />
-                <h3 style={{ fontSize: '1rem' }}>RAG Ingestion Pipeline</h3>
-              </div>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                The system utilizes a custom Retrieval-Augmented Generation pipeline:
-              </p>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <div style={{ background: 'rgba(255,215,0,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,215,0,0.1)', flex: 1 }}>
-                  <Zap size={14} color="var(--accent-gold)" style={{ marginBottom: '4px' }} />
-                  <div style={{ fontWeight: 600, fontSize: '0.8rem' }}>1. Load & Chunk</div>
-                  <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Articles are recursively split into semantic chunks.</div>
-                </div>
-                <div style={{ background: 'rgba(255,215,0,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,215,0,0.1)', flex: 1 }}>
-                  <Layers size={14} color="var(--accent-gold)" style={{ marginBottom: '4px' }} />
-                  <div style={{ fontWeight: 600, fontSize: '0.8rem' }}>2. Embed</div>
-                  <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Google's text-embedding-004 generates high-dim vectors.</div>
-                </div>
-                <div style={{ background: 'rgba(255,215,0,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,215,0,0.1)', flex: 1 }}>
-                  <Database size={14} color="var(--accent-gold)" style={{ marginBottom: '4px' }} />
-                  <div style={{ fontWeight: 600, fontSize: '0.8rem' }}>3. Index & Store</div>
-                  <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Vectors are indexed in a local MemoryStore for fast retrieval.</div>
-                </div>
+              <h3 style={{ fontSize: '1rem', color: 'var(--accent-gold)', marginBottom: '10px' }}>Next Steps / Roadmap</h3>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem' }}>Pinecone Cloud Indexing</span>
+                <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem' }}>Real-time Web Scraping</span>
+                <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem' }}>Multi-modal (Images/PDFs)</span>
+                <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '4px', fontSize: '0.75rem' }}>Response Streaming</span>
               </div>
             </div>
           </div>
