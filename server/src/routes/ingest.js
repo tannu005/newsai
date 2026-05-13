@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { isStorePopulated, getVectorCount } from '../services/vectorStoreService.js';
+import { isStorePopulated } from '../services/vectorStoreService.js';
 import { ingestDataset } from '../services/ingestionService.js';
 
 const router = Router();
