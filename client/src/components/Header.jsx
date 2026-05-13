@@ -2,7 +2,7 @@ import React from 'react';
 import { Database, Menu, Zap } from 'lucide-react';
 import Logo from './Logo';
 
-export default function Header({ ingestionStatus, onIngest, onMenuToggle }) {
+export default function Header({ ingestionStatus, onIngest, onMenuToggle, onShowOverview }) {
   const isProcessing = ingestionStatus.status === 'processing';
   const isReady = ingestionStatus.isPopulated;
 
@@ -17,7 +17,24 @@ export default function Header({ ingestionStatus, onIngest, onMenuToggle }) {
         </div>
         <div>
           <div className="header-title" style={{ fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: 700, letterSpacing: '-0.02em' }}>NewsAI</div>
-          <div className="header-subtitle">Intelligent News Analysis • RAG-Powered</div>
+          <div className="header-subtitle">
+            Intelligent News Analysis • RAG-Powered
+            <button 
+              onClick={onShowOverview}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: 'var(--accent-gold)', 
+                marginLeft: '8px', 
+                cursor: 'pointer',
+                fontSize: '0.7rem',
+                textDecoration: 'underline',
+                padding: 0
+              }}
+            >
+              How it works
+            </button>
+          </div>
         </div>
       </div>
 
@@ -36,9 +53,9 @@ export default function Header({ ingestionStatus, onIngest, onMenuToggle }) {
           }} />
           <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold)', fontWeight: 600 }}>
             {isReady
-              ? `${ingestionStatus.vectorCount || '✓'} vectors`
+              ? `${ingestionStatus.vectorCount || '✓'} vectors${ingestionStatus.articleCount ? ` • ${ingestionStatus.articleCount} articles` : ''}`
               : isProcessing
-              ? 'Ingesting...'
+              ? 'Processing...'
               : 'Not indexed'}
           </span>
         </div>

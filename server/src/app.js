@@ -6,32 +6,41 @@ import connectDB from './config/db.js';
 import chatRouter from './routes/chat.js';
 import ingestRouter from './routes/ingest.js';
 import historyRouter from './routes/history.js';
-import { getVectorCount } from './services/vectorStoreService.js';
+import { getStoreStats } from './services/vectorStoreService.js';
 
 // Connect to Database
 connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
-
 // Only mount Inngest if we have the signing key (production) or are in dev mode
+// IMPORTANT: Mount Inngest BEFORE express.json() to allow it to handle raw bodies for signature verification
 if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
   try {
     const { serve } = await import("inngest/express");
     const { inngest } = await import("./inngest/client.js");
     const { ingestNewsDataset } = await import("./inngest/functions.js");
+    
     app.use(
       "/api/inngest",
-      serve({ client: inngest, functions: [ingestNewsDataset] })
+      serve({ 
+        client: inngest, 
+        functions: [ingestNewsDataset],
+        servePath: "/api/inngest",
+        // Ensure signing key is handled: in dev mode with INNGEST_DEV=1, 
+        // the SDK should bypass verification.
+        signingKey: process.env.INNGEST_SIGNING_KEY || undefined
+      })
     );
-    console.log('✅ Inngest middleware loaded');
+    console.log('✅ Inngest middleware registered at /api/inngest');
   } catch (error) {
     console.warn('⚠️ Inngest middleware failed to load:', error.message);
   }
 }
+
+// Middleware
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json({ limit: '10mb' }));
 
 // API Routes
 app.use('/api/chat', chatRouter);
@@ -41,19 +50,25 @@ app.use('/api/history', historyRouter);
 // Health check with diagnostic info
 app.get('/api/health', async (req, res) => {
   try {
-    const vectorCount = await getVectorCount();
+    const stats = await getStoreStats();
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      hasApiKey: !!config.googleApiKey,
-      vectorCount: vectorCount,
-      embeddingModel: config.embeddingModel,
-      llmModel: config.llmModel,
-      env: process.env.NODE_ENV,
-      db: 'connected', // Temporarily hardcoded to avoid reference error
-      platform: process.env.VERCEL ? 'Vercel (Serverless)' : 'Local/Standard',
-      apiKeyPrefix: config.googleApiKey ? `${config.googleApiKey.substring(0, 7)}...` : 'not set',
-      inngestActive: !!(process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1')
+      vectorStore: {
+        populated: stats.isPopulated,
+        vectors: stats.vectorCount,
+        articles: stats.articleCount,
+        lastUpdated: stats.lastUpdated
+      },
+      config: {
+        embeddingModel: config.embeddingModel,
+        llmModel: config.llmModel,
+        hasApiKey: !!config.googleApiKey
+      },
+      environment: {
+        platform: process.env.VERCEL ? 'Vercel' : 'Local',
+        inngest: !!(process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1')
+      }
     });
   } catch (error) {
     res.status(500).json({ status: 'degraded', error: error.message });

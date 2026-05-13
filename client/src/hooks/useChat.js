@@ -54,8 +54,9 @@ export function useChat() {
     try {
       const status = await api.ingestStatus();
       setIngestionStatus(status);
+      return status;
     } catch {
-      // Server might not be running
+      return null;
     }
   }, []);
 
@@ -124,17 +125,30 @@ export function useChat() {
     try {
       setIngestionStatus((prev) => ({ ...prev, status: 'processing' }));
       const result = await api.ingest();
-      setIngestionStatus({
-        status: 'complete',
-        isPopulated: true,
-        vectorCount: result.chunksCreated,
-      });
+      
+      // If it's background ingestion, start polling
+      if (result.message && result.message.includes('background')) {
+        let attempts = 0;
+        const interval = setInterval(async () => {
+          attempts++;
+          const status = await checkIngestionStatus();
+          if (status?.isPopulated || attempts > 60) {
+            clearInterval(interval);
+          }
+        }, 5000);
+      } else {
+        setIngestionStatus({
+          status: 'complete',
+          isPopulated: true,
+          vectorCount: result.chunksCreated,
+        });
+      }
       return result;
     } catch (err) {
       setIngestionStatus((prev) => ({ ...prev, status: 'error' }));
       throw err;
     }
-  }, []);
+  }, [checkIngestionStatus]);
 
   return {
     messages,

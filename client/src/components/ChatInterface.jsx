@@ -72,10 +72,25 @@ export default function ChatInterface({ messages, isLoading, error, onSend, onAn
             <div className="chat-empty-icon" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
               <Bot size={40} color="var(--accent-gold)" />
             </div>
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '8px' }}>NewsAI Assistant</h2>
-            <p style={{ fontSize: '1rem', opacity: 0.8 }}>
-              Professional news analysis at your fingertips. Ask questions and get grounded answers from our curated dataset.
+            <h2 style={{ fontSize: '1.75rem', marginBottom: '8px', color: 'var(--accent-gold)' }}>NewsAI Premium Dashboard</h2>
+            <p style={{ fontSize: '1rem', opacity: 0.8, maxWidth: '600px', margin: '0 auto 20px' }}>
+              An advanced RAG (Retrieval-Augmented Generation) platform for intelligent news synthesis. 
+              Grounded in a curated dataset and powered by Gemini 2.0 Flash.
             </p>
+            
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px', 
+              marginBottom: '32px', 
+              flexWrap: 'wrap', 
+              justifyContent: 'center' 
+            }}>
+              <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600 }}>Gemini 2.0 Flash</span>
+              <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600 }}>Inngest Pipelines</span>
+              <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600 }}>Vector RAG</span>
+              <span className="badge" style={{ background: 'rgba(255,215,0,0.1)', color: 'var(--accent-gold)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 600 }}>Three.js UI</span>
+            </div>
+
             <div className="suggested-questions">
               {SUGGESTED_QUESTIONS.map((q, i) => (
                 <button key={i} className="suggested-btn" onClick={() => handleSuggested(q)}>

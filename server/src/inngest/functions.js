@@ -10,19 +10,27 @@ export const ingestNewsDataset = inngest.createFunction(
   { id: "ingest-news-dataset", triggers: [{ event: "api/news.ingest" }] },
   async ({ event, step }) => {
     const { forceReindex } = event.data;
+    console.log(`🚀 [Inngest] Starting ingestion. Force reindex: ${forceReindex}`);
 
-    await step.run("clear-vector-store", async () => {
-      await clearStore();
-      return { status: "cleared" };
-    });
+    if (forceReindex) {
+      await step.run("clear-vector-store", async () => {
+        console.log("🗑️ [Inngest] Clearing vector store...");
+        await clearStore();
+        return { status: "cleared" };
+      });
+    }
 
     const articles = await step.run("load-dataset", async () => {
       const datasetPath = path.resolve(config.dataPath, 'news_dataset.json');
+      console.log(`📖 [Inngest] Loading dataset from ${datasetPath}`);
       const raw = await fs.readFile(datasetPath, 'utf-8');
-      return JSON.parse(raw);
+      const data = JSON.parse(raw);
+      console.log(`📰 [Inngest] Loaded ${data.length} articles`);
+      return data;
     });
 
     const allDocuments = await step.run("chunk-articles", async () => {
+      console.log("✂️ [Inngest] Chunking articles...");
       const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: config.chunkSize,
         chunkOverlap: config.chunkOverlap,
@@ -50,26 +58,31 @@ export const ingestNewsDataset = inngest.createFunction(
           });
         }
       }
+      console.log(`✂️ [Inngest] Created ${docs.length} chunks`);
       return docs;
     });
 
     // Batch processing with Inngest steps
     const BATCH_SIZE = 50;
+    const totalBatches = Math.ceil(allDocuments.length / BATCH_SIZE);
+    
     for (let i = 0; i < allDocuments.length; i += BATCH_SIZE) {
       const batch = allDocuments.slice(i, i + BATCH_SIZE);
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
       
       await step.run(`process-batch-${batchNum}`, async () => {
+        console.log(`📊 [Inngest] Processing batch ${batchNum}/${totalBatches}`);
         // Reconstruct LangChain Documents
         const documents = batch.map(d => new Document(d));
         await addDocuments(documents);
         return { processed: documents.length };
       });
       
-      // We don't need a manual sleep here as Inngest handles concurrency/rate limiting better
-      // but we could use step.sleep if needed.
+      // Optional: Add a small sleep between batches to avoid hitting rate limits
+      // await step.sleep("1s");
     }
 
+    console.log("✅ [Inngest] Ingestion complete!");
     return {
       status: "success",
       documentsProcessed: articles.length,

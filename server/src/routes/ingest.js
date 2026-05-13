@@ -16,18 +16,21 @@ router.post('/', async (req, res) => {
     // Try Inngest first (if available), otherwise run directly
     if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
       try {
+        console.log('📡 Sending ingestion event to Inngest...');
         const { inngest } = await import('../inngest/client.js');
         const { ids } = await inngest.send({
           name: "api/news.ingest",
           data: { forceReindex },
         });
+        console.log(`✅ Event sent successfully. Event ID: ${ids[0]}`);
         return res.json({
           status: 'success',
           message: 'Ingestion started in the background',
           eventId: ids[0],
         });
       } catch (inngestError) {
-        console.warn('Inngest unavailable, falling back to direct ingestion:', inngestError.message);
+        console.warn('⚠️ Inngest unavailable or failed to send event:', inngestError.message);
+        // Continue to direct ingestion fallback
       }
     }
 
@@ -50,12 +53,8 @@ router.post('/', async (req, res) => {
  */
 router.get('/status', async (req, res) => {
   try {
-    const populated = await isStorePopulated();
-    const vectorCount = await getVectorCount();
-    res.json({
-      isPopulated: populated,
-      vectorCount,
-    });
+    const stats = await getStoreStats();
+    res.json(stats);
   } catch (error) {
     res.status(500).json({ error: 'Failed to get status' });
   }

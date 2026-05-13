@@ -6,7 +6,8 @@
   "scripts": {
     "build": "cd client && npx vite build && cp -r dist ../dist",
     "server": "node server/src/app.js",
-    "dev": "concurrently \"npm run server\" \"cd client && npm run dev\""
+    "dev": "concurrently \"npm run server\" \"cd client && npm run dev\"",
+    "inngest": "npx inngest-cli@latest dev -u http://localhost:3001/api/inngest"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

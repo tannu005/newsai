@@ -4,6 +4,7 @@ import Header from './components/Header';
 import HistoryPanel from './components/HistoryPanel';
 import ChatInterface from './components/ChatInterface';
 import { useChat } from './hooks/useChat';
+import ProjectOverviewModal from './components/ProjectOverviewModal';
 
 export default function App() {
   const {
@@ -22,6 +23,7 @@ export default function App() {
   } = useChat();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [overviewOpen, setOverviewOpen] = useState(false);
 
   const handleIngest = useCallback(async () => {
     try {
@@ -58,6 +60,7 @@ export default function App() {
             ingestionStatus={ingestionStatus}
             onIngest={handleIngest}
             onMenuToggle={() => setSidebarOpen((v) => !v)}
+            onShowOverview={() => setOverviewOpen(true)}
           />
           <ChatInterface
             messages={messages}
@@ -69,6 +72,10 @@ export default function App() {
           />
         </main>
       </div>
+      <ProjectOverviewModal 
+        isOpen={overviewOpen} 
+        onClose={() => setOverviewOpen(false)} 
+      />
     </>
   );
 }

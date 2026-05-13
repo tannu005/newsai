@@ -39,7 +39,7 @@ export async function getVectorStore() {
       vectorStore = new MemoryVectorStore(embeddings);
       vectorStore.memoryVectors = data.vectors.map((v) => ({
         content: v.content,
-        embedding: v.embedding,
+        embedding: v.embedding || v.vector || [],
         metadata: v.metadata,
       }));
       console.log(`✅ Successfully loaded ${data.vectors.length} vectors.`);
@@ -59,9 +59,32 @@ export async function getVectorStore() {
  */
 export async function addDocuments(documents) {
   const store = await getVectorStore();
-  await store.addDocuments(documents);
+  const embeddings = getEmbeddings();
+
+  console.log(`📡 Generating embeddings for ${documents.length} documents...`);
+  
+  // Manually generate embeddings to bypass any potential issues with MemoryVectorStore's internal calls
+  const texts = documents.map(doc => doc.pageContent);
+  const vectors = await embeddings.embedDocuments(texts);
+
+  if (!vectors || vectors.length === 0 || vectors[0].length === 0) {
+    console.error('❌ Failed to generate valid embeddings. Vectors are empty.');
+    throw new Error('Embedding generation failed: received empty vectors.');
+  }
+
+  // Create the memory vector objects
+  const memoryVectors = documents.map((doc, i) => ({
+    content: doc.pageContent,
+    embedding: vectors[i],
+    metadata: doc.metadata,
+  }));
+
+  // Add to the in-memory store
+  if (!store.memoryVectors) store.memoryVectors = [];
+  store.memoryVectors.push(...memoryVectors);
+  
   await persistStore();
-  console.log(`✅ Added ${documents.length} documents to vector store`);
+  console.log(`✅ Successfully added and persisted ${documents.length} documents to vector store`);
 }
 
 /**
@@ -87,11 +110,28 @@ export async function isStorePopulated() {
 }
 
 /**
- * Get the count of vectors in the store.
+ * Get the count of vectors and other stats.
  */
-export async function getVectorCount() {
+export async function getStoreStats() {
   const store = await getVectorStore();
-  return store.memoryVectors ? store.memoryVectors.length : 0;
+  const vectorCount = store.memoryVectors ? store.memoryVectors.length : 0;
+  
+  // Calculate unique articles if possible
+  const uniqueArticles = new Set();
+  if (store.memoryVectors) {
+    store.memoryVectors.forEach(v => {
+      if (v.metadata && v.metadata.articleId) {
+        uniqueArticles.add(v.metadata.articleId);
+      }
+    });
+  }
+
+  return {
+    isPopulated: vectorCount > 0,
+    vectorCount,
+    articleCount: uniqueArticles.size,
+    lastUpdated: vectorStore ? new Date().toISOString() : null // Rough estimate
+  };
 }
 
 /**
@@ -111,7 +151,7 @@ async function persistStore() {
     const data = {
       vectors: vectorStore.memoryVectors.map((v) => ({
         content: v.content,
-        embedding: v.embedding,
+        embedding: v.embedding || v.vector || [],
         metadata: v.metadata,
       })),
       savedAt: new Date().toISOString(),
