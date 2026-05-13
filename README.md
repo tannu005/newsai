@@ -30,8 +30,9 @@ Every AI response features an **"Analyze with AI"** button that performs a multi
 - **Additional Context**: Broader background information not in the original answer.
 - **Follow-up Questions**: Smart suggestions to continue the exploration.
 
-### 3. Professional History Management
-- **Hybrid Persistence**: Supports MongoDB (Production), JSON Files (Local), and In-Memory Fallbacks (Vercel).
+### 3. Professional History Management (MongoDB)
+- **Primary Database**: The project uses **MongoDB** (via Mongoose) for robust chat history persistence.
+- **Hybrid Strategy**: Supports MongoDB (Production), JSON Files (Local), and In-Memory Fallbacks (Serverless/Vercel).
 - **Session Grouping**: Automatically organizes your chats into named sessions based on your first question.
 
 ---
@@ -77,7 +78,23 @@ Every AI response features an **"Analyze with AI"** button that performs a multi
 
 ---
 
-## 🛠 Setup & Installation
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|:------|:-----------|
+| **Frontend** | React 18, Vite, React Three Fiber, Framer Motion, Lucide Icons |
+| **Design** | Premium Black & Gold Theme (#0D0D0D / #FFD700) |
+| **3D Graphics** | Three.js (Interactive Robotic Assistant) |
+| **Backend** | Node.js, Express.js |
+| **Database** | **MongoDB** (via Mongoose) |
+| **AI / RAG** | LangChain.js, Google Gemini 2.0 Flash |
+| **Embeddings** | Gemini `text-embedding-004` |
+| **Vector Store** | MemoryVectorStore (with JSON/Disk persistence) |
+| **Styling** | Vanilla CSS (Glassmorphic design system) |
+
+---
+
+## ⚙️ Setup & Installation
 
 ### 1. Prerequisites
 - **Node.js 18+**
@@ -112,7 +129,7 @@ The application comes bundled with a curated dataset of 30 modern news articles 
 ---
 
 ## 👨‍💻 Author
-**Yogesh Pannu** — Full-Stack & GenAI Developer
+**Tannu Yadav** — Full-Stack & GenAI Developer
 
 ---
 ## 📜 License

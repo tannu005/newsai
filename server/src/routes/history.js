@@ -32,9 +32,10 @@ router.get('/', async (req, res) => {
 
     // Get the first user message as session title
     for (const session of Object.values(sessions)) {
-      const firstUserMsg = session.messages.find((m) => m.role === 'user');
-      session.title = firstUserMsg
-        ? firstUserMsg.content.substring(0, 60) + (firstUserMsg.content.length > 60 ? '...' : '')
+      const firstUserMsg = session.messages.find((m) => m && m.role === 'user');
+      const content = firstUserMsg ? String(firstUserMsg.content || '') : '';
+      session.title = content 
+        ? content.substring(0, 60) + (content.length > 60 ? '...' : '')
         : 'New Chat';
     }
 

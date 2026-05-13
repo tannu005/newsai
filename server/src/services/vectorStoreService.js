@@ -1,24 +1,21 @@
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { getEmbeddings } from './embeddingService.js';
+import { getEmbeddings, getQueryEmbeddings } from './embeddingService.js';
 import config from '../config/index.js';
 import fs from 'fs/promises';
 import path from 'path';
-
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url);
 
 let vectorStore = null;
 const STORE_FILE = path.join(config.vectorStorePath, 'store.json');
 
 /**
  * Initialize or retrieve the vector store singleton.
- * Attempts to load persisted data from disk on first call.
  */
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
 export async function getVectorStore() {
   if (vectorStore) return vectorStore;
 
@@ -27,14 +24,15 @@ export async function getVectorStore() {
   try {
     let data;
     try {
-      // First try to read from disk (for local dev where we might have just ingested)
       const raw = await fs.readFile(STORE_FILE, 'utf-8');
       data = JSON.parse(raw);
     } catch (e) {
-      // If disk read fails (like on Vercel), fallback to the bundled require
-      // NOTE: The path must be a static string for Vercel's bundler to include the file
       console.log('Falling back to bundled vector store data...');
-      data = require('../vectorstore/store.json');
+      try {
+        data = require('../vectorstore/store.json');
+      } catch (err) {
+        console.warn('No bundled store found.');
+      }
     }
 
     if (data && data.vectors && data.vectors.length > 0) {
@@ -58,7 +56,6 @@ export async function getVectorStore() {
 
 /**
  * Add documents to the vector store and persist to disk.
- * @param {import('@langchain/core/documents').Document[]} documents
  */
 export async function addDocuments(documents) {
   const store = await getVectorStore();
@@ -68,14 +65,16 @@ export async function addDocuments(documents) {
 }
 
 /**
- * Perform similarity search and return top-K results with scores.
- * @param {string} query
- * @param {number} k
- * @returns {Promise<Array<{document: import('@langchain/core/documents').Document, score: number}>>}
+ * Perform similarity search using query-optimized embeddings.
  */
 export async function similaritySearch(query, k = config.topK) {
   const store = await getVectorStore();
-  const results = await store.similaritySearchWithScore(query, k);
+  
+  // Use query-optimized embeddings for search
+  const queryEmbedder = getQueryEmbeddings();
+  const queryVector = await queryEmbedder.embedQuery(query);
+  
+  const results = await store.similaritySearchVectorWithScore(queryVector, k);
   return results.map(([document, score]) => ({ document, score }));
 }
 
@@ -101,14 +100,12 @@ export async function getVectorCount() {
 async function persistStore() {
   if (!vectorStore) return;
 
-  // Skip persistence on Vercel (read-only filesystem)
   if (process.env.VERCEL) {
     console.log('💾 Skipping vector store persistence (Vercel environment)');
     return;
   }
 
   try {
-    // Ensure directory exists
     await fs.mkdir(config.vectorStorePath, { recursive: true });
 
     const data = {
@@ -123,19 +120,17 @@ async function persistStore() {
     await fs.writeFile(STORE_FILE, JSON.stringify(data), 'utf-8');
     console.log(`💾 Persisted ${data.vectors.length} vectors to disk`);
   } catch (error) {
-    console.warn(`⚠️ Failed to persist store (expected on read-only environments): ${error.message}`);
+    console.warn(`⚠️ Failed to persist store: ${error.message}`);
   }
 }
 
 /**
- * Clear the vector store and remove persisted data.
+ * Clear the vector store.
  */
 export async function clearStore() {
   vectorStore = new MemoryVectorStore(getEmbeddings());
   try {
     await fs.unlink(STORE_FILE);
-  } catch {
-    // File may not exist
-  }
+  } catch { }
   console.log('🗑️ Vector store cleared');
 }

@@ -126,7 +126,7 @@ export default function AnalyzeModal({ isOpen, onClose, analysis, isLoading, onF
             ))}
           </div>
 
-          <div className="modal-body" style={{ background: 'var(--bg-primary)' }}>
+          <div className="modal-body" style={{ background: 'var(--bg-primary)', padding: '24px', lineHeight: '1.6', fontSize: '0.95rem' }}>
             {renderContent()}
           </div>
         </motion.div>

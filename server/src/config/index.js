@@ -16,8 +16,8 @@ const config = {
   chunkSize: parseInt(process.env.CHUNK_SIZE, 10) || 800,
   chunkOverlap: parseInt(process.env.CHUNK_OVERLAP, 10) || 200,
   dataPath: path.resolve(__dirname, '../data'),
-  embeddingModel: 'gemini-embedding-001',
-  llmModel: 'gemini-2.5-flash',
+  embeddingModel: process.env.EMBEDDING_MODEL || 'gemini-embedding-001',
+  llmModel: process.env.LLM_MODEL || 'gemini-2.5-flash-lite',
   topK: 5,
   temperature: 0.3,
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Sparkles } from 'lucide-react';
 
-export default function SourceCard({ source }) {
+export default function SourceCard({ source, onAnalyze }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -17,15 +17,33 @@ export default function SourceCard({ source }) {
         </span>
         <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>{source.source}</span>
         {source.url && (
-          <a
-            href={source.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            style={{ color: 'var(--accent-gold)', display: 'flex' }}
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="source-link"
+              style={{ color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+            >
+              <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>Visit {source.source}</span>
+              <ExternalLink size={12} />
+            </a>
+        )}
+        {onAnalyze && (
+          <button
+            className="analyze-btn"
+            onClick={(e) => { e.stopPropagation(); onAnalyze(); }}
+            style={{ 
+              padding: '2px 8px', 
+              fontSize: '0.65rem', 
+              background: 'rgba(255, 215, 0, 0.1)', 
+              border: '1px solid rgba(255, 215, 0, 0.2)',
+              marginLeft: 'auto'
+            }}
           >
-            <ExternalLink size={12} />
-          </a>
+            <Sparkles size={10} style={{ marginRight: '4px' }} />
+            Analyze
+          </button>
         )}
       </div>
       {expanded && source.snippet && (

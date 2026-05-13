@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
   try {
     const { query, sessionId, analyze, originalQuery, originalAnswer, context } = req.body;
 
-    if (!query && !analyze) {
+    if (!analyze && !query) {
       return res.status(400).json({ error: 'Query is required' });
     }
 
@@ -34,7 +34,7 @@ router.post('/', async (req, res) => {
     const messageId = uuidv4();
     const session = sessionId || uuidv4();
 
-    // Save to history
+    // Save user message
     const userMessage = {
       id: uuidv4(),
       role: 'user',
@@ -42,7 +42,9 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       sessionId: session,
     };
+    await appendToHistory(userMessage);
 
+    // Save AI message
     const aiMessage = {
       id: messageId,
       role: 'assistant',
@@ -52,8 +54,6 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       sessionId: session,
     };
-
-    await appendToHistory(userMessage);
     await appendToHistory(aiMessage);
 
     res.json({
@@ -65,6 +65,23 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Chat error:', error);
+    
+    // Attempt to save the user message even on failure if we have a query
+    try {
+      const { query, sessionId } = req.body;
+      if (query) {
+        await appendToHistory({
+          id: uuidv4(),
+          role: 'user',
+          content: query,
+          timestamp: new Date().toISOString(),
+          sessionId: sessionId || 'failed-session',
+        });
+      }
+    } catch (hErr) {
+      console.error('Failed to save user message during error handling:', hErr);
+    }
+
     res.status(500).json({ error: 'Failed to process chat request', details: error.message });
   }
 });

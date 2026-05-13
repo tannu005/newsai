@@ -21,7 +21,7 @@ export default function App() {
     setError,
   } = useChat();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleIngest = useCallback(async () => {
     try {

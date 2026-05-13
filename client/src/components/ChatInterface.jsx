@@ -5,10 +5,10 @@ import SourceCard from './SourceCard';
 import AnalyzeModal from './AnalyzeModal';
 
 const SUGGESTED_QUESTIONS = [
-  "What are the latest breakthroughs in AI technology?",
-  "Tell me about recent developments in renewable energy",
-  "What's happening in the global financial markets?",
-  "Summarize the latest health and medical research news",
+  "What's the status of the NASA Artemis III mission?",
+  "Tell me about the breakthrough Alzheimer's drug ALZ-4010",
+  "How does IBM's Condor quantum processor differ from Osprey?",
+  "Summarize the key agreements reached at the COP29 summit",
 ];
 
 export default function ChatInterface({ messages, isLoading, error, onSend, onAnalyze, onClearError }) {
@@ -101,18 +101,30 @@ export default function ChatInterface({ messages, isLoading, error, onSend, onAn
                   </div>
 
                   {/* Source cards for AI messages */}
-                  {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                    {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                     <div className="sources-container">
                       {msg.sources.map((src, i) => (
-                        <SourceCard key={i} source={src} />
+                        <SourceCard 
+                          key={i} 
+                          source={src} 
+                          onAnalyze={() => handleAnalyze({ 
+                            originalQuery: msg.originalQuery || 'Deep Analysis', 
+                            content: src.snippet, 
+                            context: src.snippet 
+                          })}
+                        />
                       ))}
                     </div>
                   )}
 
                   {/* Analyze button for AI messages */}
-                  {msg.role === 'assistant' && msg.content && !msg.content.startsWith('⚠️') && (
+                  {msg.role === 'assistant' && msg.content && (
                     <div className="message-actions">
-                      <button className="analyze-btn" onClick={() => handleAnalyze(msg)}>
+                      <button 
+                        className="analyze-btn" 
+                        onClick={() => handleAnalyze(msg)}
+                        title="Deep Analysis"
+                      >
                         <Sparkles size={13} />
                         Analyze with AI
                       </button>

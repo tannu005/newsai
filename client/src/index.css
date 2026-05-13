@@ -542,10 +542,18 @@ code {
   transition: all 0.3s var(--ease-out);
 }
 
-.analyze-btn:hover {
+.analyze-btn:hover:not(:disabled) {
   background: rgba(255, 215, 0, 0.2);
   box-shadow: var(--glow-teal);
   transform: translateY(-1px);
+}
+
+.analyze-btn:disabled {
+  background: rgba(128, 128, 128, 0.05);
+  border-color: rgba(128, 128, 128, 0.2);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* ── Source Cards ── */

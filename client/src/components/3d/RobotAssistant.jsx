@@ -134,14 +134,23 @@ export default function RobotAssistant({ isResponding }) {
         </group>
 
         {/* Floating Rings around Robot */}
-        <mesh position={[0, -0.5, 0]} rotation={[Math.PI / 2.2, 0, 0]}>
-          <torusGeometry args={[1.2, 0.02, 16, 100]} />
-          <meshBasicMaterial color="#FFD700" transparent opacity={0.3} />
-        </mesh>
-        <mesh position={[0, -1.2, 0]} rotation={[Math.PI / 1.8, 0, 0]}>
-          <torusGeometry args={[0.8, 0.02, 16, 100]} />
-          <meshBasicMaterial color="#B87333" transparent opacity={0.3} />
-        </mesh>
+        <group onUpdate={(self) => {
+          if (isResponding) {
+            self.rotation.y += 0.05;
+            self.rotation.z += 0.02;
+          } else {
+            self.rotation.y += 0.01;
+          }
+        }}>
+          <mesh position={[0, -0.5, 0]} rotation={[Math.PI / 2.2, 0, 0]}>
+            <torusGeometry args={[1.2, 0.02, 16, 100]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.3} />
+          </mesh>
+          <mesh position={[0, -1.2, 0]} rotation={[Math.PI / 1.8, 0, 0]}>
+            <torusGeometry args={[0.8, 0.02, 16, 100]} />
+            <meshBasicMaterial color="#B87333" transparent opacity={0.3} />
+          </mesh>
+        </group>
 
         {/* Dynamic Light */}
         <pointLight
