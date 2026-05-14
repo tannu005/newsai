@@ -17,6 +17,7 @@ export function getLLM() {
       model: config.llmModel,
       temperature: config.temperature,
       maxOutputTokens: 4096,
+      maxRetries: 0,
     });
   }
   return llmInstance;
@@ -47,7 +48,7 @@ CONTEXT FROM NEWS ARTICLES:
 ${context}`;
 
   let response;
-  const allModels = [config.llmModel, 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
+  const allModels = [config.llmModel];
   // Deduplicate
   const modelsToTry = [...new Set(allModels)];
 
@@ -59,6 +60,7 @@ ${context}`;
           model: model,
           temperature: config.temperature,
           maxOutputTokens: 4096,
+          maxRetries: 0,
         });
         console.info(`Trying model: ${model} (attempt ${attempt + 1})...`);
         response = await currentLlm.invoke([
@@ -70,7 +72,7 @@ ${context}`;
         console.warn(`Model ${model} attempt ${attempt + 1} failed: ${err.message}`);
         // If rate-limited (429), wait and retry the same model
         if (err.message?.includes('429') || err.message?.includes('RESOURCE_EXHAUSTED')) {
-          const delay = (attempt + 1) * 5000;
+          const delay = (attempt + 1) * 1500;
           console.info(`Rate limited on ${model}, waiting ${delay}ms before retry...`);
           await new Promise(r => setTimeout(r, delay));
           continue;
@@ -87,14 +89,14 @@ ${context}`;
 
   console.error('All generation models failed.');
   // Graceful degradation: If API fails, provide a simple summary from context
-    if (context && context.length > 0) {
-      const snippets = context.split('\n\n---\n\n').slice(0, 2);
-      const summary = snippets.map(s => s.split('\n').slice(1).join(' ').substring(0, 300)).join('... ');
-      return `⚠️ **Note: AI is currently in "High Traffic" mode.**\n\nI retrieved the following key information from our dataset:\n\n${summary}...\n\n*Please try again in a few minutes for a more detailed analysis.*`;
-    }
-    
-    return "⚠️ I'm currently experiencing high demand. Please try again in a few moments.";
+  if (context && context.length > 0) {
+    const snippets = context.split('\n\n---\n\n').slice(0, 2);
+    const summary = snippets.map(s => s.split('\n').slice(1).join(' ').substring(0, 300)).join('... ');
+    return `⚠️ **Note: AI is currently in "High Traffic" mode.**\n\nI retrieved the following key information from our dataset:\n\n${summary}...\n\n*Please try again in a few minutes for a more detailed analysis.*`;
   }
+
+  return "⚠️ I'm currently experiencing high demand. Please try again in a few moments.";
+}
 
 /**
  * Perform deep analysis of a chatbot response.
@@ -106,9 +108,9 @@ ${context}`;
  */
 export async function analyzeResponse(originalQuery, originalAnswer, context) {
   const primaryLlm = getLLM();
-  const allModels = [config.llmModel, 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
+  const allModels = [config.llmModel];
   const modelsToTry = [...new Set(allModels)];
-  
+
   const analysisPrompt = `You are an expert news analyst. Analyze the following chatbot response and provide a structured deep-dive analysis.
 
 ORIGINAL QUESTION: ${originalQuery}
@@ -145,6 +147,7 @@ Respond ONLY with valid JSON. Do not include markdown code blocks.
           model: model,
           temperature: config.temperature,
           maxOutputTokens: 4096,
+          maxRetries: 0,
         });
         console.info(`Analysis: trying model ${model} (attempt ${attempt + 1})...`);
         response = await currentLlm.invoke([{ role: 'user', content: analysisPrompt }]);
@@ -153,7 +156,7 @@ Respond ONLY with valid JSON. Do not include markdown code blocks.
         lastError = err;
         console.warn(`Analysis model ${model} attempt ${attempt + 1} failed: ${err.message}`);
         if (err.message?.includes('429') || err.message?.includes('RESOURCE_EXHAUSTED')) {
-          const delay = (attempt + 1) * 5000;
+          const delay = (attempt + 1) * 1500;
           console.info(`Rate limited on ${model}, waiting ${delay}ms before retry...`);
           await new Promise(r => setTimeout(r, delay));
           continue;
@@ -178,7 +181,7 @@ Respond ONLY with valid JSON. Do not include markdown code blocks.
   try {
     let content = response.content.trim();
     console.log('--- RAW ANALYSIS RESPONSE ---\n', content, '\n---------------------------');
-    
+
     // Try to extract the JSON object from the response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -187,7 +190,7 @@ Respond ONLY with valid JSON. Do not include markdown code blocks.
 
     try {
       const parsed = JSON.parse(content);
-      
+
       // Validate and clean fields
       const cleaned = {
         explanation: typeof parsed.explanation === 'string' ? parsed.explanation : JSON.stringify(parsed.explanation),
@@ -196,7 +199,7 @@ Respond ONLY with valid JSON. Do not include markdown code blocks.
         additionalContext: typeof parsed.additionalContext === 'string' ? parsed.additionalContext : '',
         followUpQuestions: Array.isArray(parsed.followUpQuestions) ? parsed.followUpQuestions : []
       };
-      
+
       if (cleaned.explanation && cleaned.keyInsights.length > 0) return cleaned;
       throw new Error('Missing core fields');
     } catch (parseError) {

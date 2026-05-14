@@ -51,7 +51,7 @@ export default function ProjectOverviewModal({ isOpen, onClose }) {
                 <li style={{ marginBottom: '8px' }}>• <strong>Node.js & Express</strong> RESTful API architecture</li>
                 <li style={{ marginBottom: '8px' }}>• <strong>Inngest</strong> for robust background event-driven ingestion</li>
                 <li style={{ marginBottom: '8px' }}>• <strong>LangChain</strong> for RAG & Analytical pipelines</li>
-                <li style={{ marginBottom: '8px' }}>• <strong>Gemini AI (Flash 2.0)</strong> for LLM and Embeddings</li>
+                <li style={{ marginBottom: '8px' }}>• <strong>Gemini 2.5 Flash Lite</strong> for LLM and Embeddings</li>
               </ul>
             </div>
 

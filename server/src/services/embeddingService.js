@@ -16,8 +16,9 @@ export function getEmbeddings() {
     
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: config.googleApiKey,
-      model: 'gemini-embedding-2',
+      model: config.embeddingModel,
       taskType: TaskType.RETRIEVAL_DOCUMENT,
+      maxRetries: 0,
     });
 
     // Workaround: Batch embedDocuments returns empty vectors in this environment.
@@ -59,7 +60,8 @@ export function getQueryEmbeddings() {
   }
   return new GoogleGenerativeAIEmbeddings({
     apiKey: config.googleApiKey,
-    model: 'gemini-embedding-2',
+    model: config.embeddingModel,
     taskType: TaskType.RETRIEVAL_QUERY,
+    maxRetries: 0,
   });
 }
