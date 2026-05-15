@@ -8,18 +8,27 @@ import ingestRouter from './routes/ingest.js';
 import historyRouter from './routes/history.js';
 import { getStoreStats } from './services/vectorStoreService.js';
 
-// Connect to Database
-connectDB();
+// Connect to Database - handle errors gracefully to prevent initialization crash
+connectDB().catch(err => console.error('🔴 DB Connection Error:', err.message));
 
 const app = express();
+
+// Global Error Handling for the process
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔴 Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('🔴 Uncaught Exception:', err);
+});
 
 // Body parsing middleware must be registered BEFORE Inngest so Inngest can read the request body
 app.use(express.json({ limit: '10mb' }));
 
 // Only mount Inngest if we have the signing key (production) or are in dev mode
-// IMPORTANT: Mount Inngest BEFORE express.json() to allow it to handle raw bodies for signature verification
 if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
   try {
+    console.log('📡 Initializing Inngest middleware...');
     const { serve } = await import("inngest/express");
     const { inngest } = await import("./inngest/client.js");
     const { ingestNewsDataset } = await import("./inngest/functions.js");
@@ -30,8 +39,6 @@ if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
         client: inngest, 
         functions: [ingestNewsDataset],
         servePath: "/api/inngest",
-        // Ensure signing key is handled: in dev mode with INNGEST_DEV=1, 
-        // the SDK should bypass verification.
         signingKey: process.env.INNGEST_SIGNING_KEY || undefined
       })
     );
@@ -40,6 +47,7 @@ if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
     console.warn('⚠️ Inngest middleware failed to load:', error.message);
   }
 }
+
 
 // Other Middleware
 app.use(cors({ origin: true, credentials: true }));

@@ -27,11 +27,14 @@ export async function getVectorStore() {
       const raw = await fs.readFile(STORE_FILE, 'utf-8');
       data = JSON.parse(raw);
     } catch (e) {
-      console.log('Falling back to bundled vector store data...');
+      const bundledPath = path.resolve(__dirname, '../vectorstore/store.json');
       try {
-        data = require('../vectorstore/store.json');
+        const stats = await fs.stat(bundledPath);
+        if (stats.isFile()) {
+          data = require(bundledPath);
+        }
       } catch (err) {
-        console.warn('No bundled store found.');
+        console.warn('No bundled store found at:', bundledPath);
       }
     }
 

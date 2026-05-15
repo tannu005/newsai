@@ -35,11 +35,11 @@ export function getEmbeddings() {
       } catch (err) {
         console.warn('⚠️ Batch embedding failed/empty. Sequential fallback initiated (this may take several minutes due to rate limits)...', err.message);
         const vectors = [];
+        const delay = process.env.VERCEL ? 200 : 2000; // Much shorter delay on Vercel to avoid timeouts
         for (const text of texts) {
           const v = await embeddings.embedQuery(text);
           vectors.push(v);
-          // 2-second delay to stay under the 30 RPM limit for newer models
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
         return vectors;
       }

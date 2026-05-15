@@ -8,16 +8,13 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/client/dist/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/client/dist/index.html"
+      "destination": "/index.html"
     }
   ],
   "functions": {
-    "api/**/*.js": {
-      "includeFiles": "server/src/data/**"
+    "api/index.js": {
+      "includeFiles": "server/src/**"
     }
   }
 }
+
