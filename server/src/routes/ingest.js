@@ -4,6 +4,8 @@ import { ingestDataset, ingestionProgress } from '../services/ingestionService.j
 
 const router = Router();
 
+import { inngest } from '../inngest/client.js';
+
 /**
  * POST /api/ingest
  * Triggers the dataset ingestion pipeline.
@@ -13,25 +15,22 @@ router.post('/', async (req, res) => {
   try {
     const forceReindex = req.body.forceReindex || false;
 
-    // Try Inngest first (if available), otherwise run directly
-    if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
-      try {
-        console.log('📡 Sending ingestion event to Inngest...');
-        const { inngest } = await import('../inngest/client.js');
-        const { ids } = await inngest.send({
-          name: "api/news.ingest",
-          data: { forceReindex },
-        });
-        console.log(`✅ Event sent successfully. Event ID: ${ids[0]}`);
-        return res.json({
-          status: 'success',
-          message: 'Ingestion started in the background',
-          eventId: ids[0],
-        });
-      } catch (inngestError) {
-        console.warn('⚠️ Inngest unavailable or failed to send event:', inngestError.message);
-        // Continue to direct ingestion fallback
-      }
+    // Try Inngest first
+    try {
+      console.log('📡 Sending ingestion event to Inngest...');
+      const { ids } = await inngest.send({
+        name: "api/news.ingest",
+        data: { forceReindex },
+      });
+      console.log(`✅ Event sent successfully. Event ID: ${ids[0]}`);
+      return res.json({
+        status: 'success',
+        message: 'Ingestion started in the background',
+        eventId: ids[0],
+      });
+    } catch (inngestError) {
+      console.warn('⚠️ Inngest failed to send event:', inngestError.message);
+      // Fallback to direct ingestion handled below
     }
 
     // Direct ingestion fallback
