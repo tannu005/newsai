@@ -8,7 +8,11 @@ import ingestRouter from './routes/ingest.js';
 import historyRouter from './routes/history.js';
 import { getStoreStats } from './services/vectorStoreService.js';
 
-// Connect to Database - handle errors gracefully to prevent initialization crash
+import { serve } from "inngest/express";
+import { inngest } from "./inngest/client.js";
+import { ingestNewsDataset } from "./inngest/functions.js";
+
+// Connect to Database - handle errors gracefully
 connectDB().catch(err => console.error('🔴 DB Connection Error:', err.message));
 
 const app = express();
@@ -22,30 +26,23 @@ process.on('uncaughtException', (err) => {
   console.error('🔴 Uncaught Exception:', err);
 });
 
-// Body parsing middleware must be registered BEFORE Inngest so Inngest can read the request body
+// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 
-// Only mount Inngest if we have the signing key (production) or are in dev mode
-if (process.env.INNGEST_SIGNING_KEY || process.env.INNGEST_DEV === '1') {
-  try {
-    console.log('📡 Initializing Inngest middleware...');
-    const { serve } = await import("inngest/express");
-    const { inngest } = await import("./inngest/client.js");
-    const { ingestNewsDataset } = await import("./inngest/functions.js");
-    
-    app.use(
-      "/api/inngest",
-      serve({ 
-        client: inngest, 
-        functions: [ingestNewsDataset],
-        servePath: "/api/inngest",
-        signingKey: process.env.INNGEST_SIGNING_KEY || undefined
-      })
-    );
-    console.log('✅ Inngest middleware registered at /api/inngest');
-  } catch (error) {
-    console.warn('⚠️ Inngest middleware failed to load:', error.message);
-  }
+// Mount Inngest
+try {
+  app.use(
+    "/api/inngest",
+    serve({ 
+      client: inngest, 
+      functions: [ingestNewsDataset],
+      servePath: "/api/inngest",
+      signingKey: process.env.INNGEST_SIGNING_KEY || undefined
+    })
+  );
+  console.log('✅ Inngest middleware registered at /api/inngest');
+} catch (error) {
+  console.warn('⚠️ Inngest middleware failed to load:', error.message);
 }
 
 
